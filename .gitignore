@@ -1,0 +1,6 @@
+bin/
+*.exe
+*.o
+results/*.csv
+__pycache__/
+.ipynb_checkpoints/
