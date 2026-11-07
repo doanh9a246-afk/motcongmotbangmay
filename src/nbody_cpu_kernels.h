@@ -105,6 +105,12 @@ static double nb_run_cpu(vec4f *pos, vec4f *vel, vec4f *acc, int n, int steps, f
     int s;
     /* OpenMP voi 1 luong == tuan tu (va tranh loi libgomp MinGW noi o tren). */
     if (parallel && nb_num_threads() == 1) parallel = 0;
+    /*
+     * Warm-up (khong tinh gio): lan dau vao vung song song, runtime OpenMP phai tao
+     * cac luong -> neu tinh vao thoi gian se lam speedup bi sai, nhat la khi N nho.
+     * Chi ghi vao acc (mang tam) nen khong lam thay doi trang thai mo phong.
+     */
+    if (parallel) nb_acc_omp(pos, acc, n, eps2);
     if (out) nb_write_frame(out, 0, pos, n);
     for (s = 1; s <= steps; s++) {
         double t0 = nb_wtime();
