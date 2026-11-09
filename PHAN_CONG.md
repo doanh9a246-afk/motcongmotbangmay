@@ -35,7 +35,7 @@ Nguyên tắc chia việc: mỗi người phụ trách **1 phần code + 1 nhóm
 - Báo cáo **Ch.3**: mô hình fork-join, cách chia vòng lặp, vì sao không có race condition, phân tích kết quả đo (vì sao speedup < lý tưởng: băng thông bộ nhớ, nhân P/E, turbo).
 
 ### Trần Tiến Đạt — CUDA
-- Phụ trách `src/nbody_cuda.cu` và `notebooks/nbody_colab.ipynb`. **Việc đầu tiên:** biên dịch và chạy `-verify` trên Colab (bản CUDA chưa được test trên GPU thật), báo lỗi cho nhóm trưởng nếu có.
+- Phụ trách `src/nbody_cuda.cu` và `notebooks/nbody_colab.ipynb`. ~~Việc đầu tiên: biên dịch và chạy `-verify` trên Colab~~ — **xong (09/11): PASS cả naive và tiled trên T4.**
 - Thí nghiệm: kernel naive vs tiled (shared memory) với N = 4096 → 131072; block size 64/128/256/512; tỉ lệ thời gian sao chép H2D/D2H so với thời gian tính; (nâng cao) thử `#pragma unroll`, profile bằng Nsight Compute.
 - Báo cáo **Ch.4**: kiến trúc GPU, ánh xạ 1 thread = 1 vật thể, thuật toán tile của GPU Gems 3 (hình minh họa tile), shared memory và `__syncthreads()`, phân tích kết quả, so sánh với số liệu trong GPU Gems 3.
 
@@ -52,5 +52,7 @@ Mỗi người tự thuyết trình phần của mình (~5 phút/người).
 
 ## Quy ước làm việc
 - Mỗi người làm trên nhánh riêng (`git checkout -b <ten>/<viec>`), tạo Pull Request; nhóm trưởng review rồi merge vào `main`.
-- Số liệu đưa vào báo cáo phải đo trên **cùng một máy** (Colab T4 + CPU của Colab, hoặc ghi rõ cấu hình máy).
+- Số liệu GPU đo trên **Colab T4**. Số liệu CPU/OpenMP đo trên **máy nhiều lõi thật** (laptop/PC), không dùng Colab vì Colab chỉ có 2 vCPU. Luôn ghi rõ cấu hình máy (CPU, số lõi/luồng, trình biên dịch) cạnh mỗi bảng số liệu.
+- Khi so sánh GPU với CPU trong Ch.5, dùng số liệu CPU tốt nhất (OpenMP trên máy nhiều lõi), không dùng CPU của Colab.
+- Không dán token/mật khẩu vào notebook, code hay ảnh chụp gửi nhóm. Repo đã public nên clone không cần token.
 - Kết quả thô (`results/*.csv`) gửi kèm để nhóm trưởng tổng hợp.

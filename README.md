@@ -101,13 +101,23 @@ Laptop 16 luồng, MinGW gcc 12.1, 5 bước. Số liệu laptop dao động m�
 | 4096 | 25.96 | 7.86 | 3.3× |
 | 8192 | 77.46 | 15.31 | 5.1× |
 
-Kiểm tra: `-verify` cho sai số 0 (OpenMP khớp tuần tự từng bit); `|ΔE/E₀| ≈ 1e-6` sau 10 bước, `≈ 3e-5` sau 1000 bước (N = 2048).
+**GPU (Colab Tesla T4, N = 4096, 5 bước, block 256):**
+
+| Kernel | ms/bước | GFLOP/s | Sai số so với CPU |
+|---|---|---|---|
+| naive | 0.582 | 577 | 1.0e-8 (PASS) |
+| tiled | 0.309 | 1086 | 1.0e-8 (PASS) |
+
+Tiled nhanh hơn naive ~1.9×. Với N = 4096 chỉ có 16 block cho 40 SM nên GPU chưa được tận dụng hết; số liệu chính thức sẽ đo với N lớn hơn.
+
+Kiểm tra CPU: `-verify` cho sai số 0 (OpenMP khớp tuần tự từng bit); `|ΔE/E₀| ≈ 1e-6` sau 10 bước, `≈ 3e-5` sau 1000 bước (N = 2048).
 
 ## 7. Lưu ý kỹ thuật
 
 - Trên MinGW gcc 12.1 (bản Brecht Sanders), libgomp làm chương trình thoát (mã 127) với **mọi vùng song song chỉ có 1 luồng**. Code đã né lỗi này: dùng `num_threads(...)` thay vì `omp_set_num_threads`, và chạy nhánh tuần tự khi chỉ có 1 luồng. Trên Linux/Colab không bị.
 - Thời gian đo **không** gồm khởi tạo, ghi file, tính năng lượng. Bản CUDA in riêng thời gian sao chép H2D/D2H; có 1 lần warm-up kernel trước khi đo.
-- Bản CUDA chưa được biên dịch trên máy phát triển (không có GPU NVIDIA) — cần chạy thử trên Colab trước tiên (việc của Đạt, xem phân công).
+- Bản CUDA đã được biên dịch và kiểm tra trên Colab (Tesla T4): `-verify` PASS cho cả naive và tiled.
+- Colab chỉ có 2 vCPU (thường là 2 luồng hyper-thread của 1 lõi) → OpenMP trên Colab không nhanh hơn tuần tự. Thí nghiệm CPU/OpenMP cần đo trên máy nhiều lõi thật.
 
 ## 8. Cấu trúc thư mục
 
