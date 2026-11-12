@@ -42,6 +42,8 @@ typedef struct {
     int every;             /* ghi 1 frame moi 'every' buoc */
     int verify;            /* so sanh voi ban tham chieu */
     int no_energy;         /* bo qua tinh nang luong (O(N^2) tren CPU) */
+    const char *sched;     /* static | dynamic | guided (mac dinh: static) */
+    int simd;              /* 1 = co simd, 0 = khong simd (mac dinh: 1) */
 } nb_params;
 
 /* ------------------------------------------------------------------ */
@@ -217,8 +219,10 @@ static void nb_usage(const char *prog, int is_cuda)
                 "  -verify       so sanh ket qua voi ban CPU (dung N, steps nho)\n");
     else
         fprintf(stderr,
-                "  -m <mode>     serial | omp              (mac dinh omp)\n"
+                "  -m <mode>     serial | omp | omp_newton3 (mac dinh omp)\n"
                 "  -t <threads>  so luong OpenMP           (mac dinh: tat ca loi)\n"
+                "  -sched <sch>  static | dynamic | guided (mac dinh: static)\n"
+                "  -simd <0|1>   1: dung SIMD reduction, 0: tat SIMD (mac dinh 1)\n"
                 "  -verify       so sanh ket qua omp voi serial\n");
     fprintf(stderr,
             "  -o <file.csv> ghi quy dao (chi nen dung voi N nho)\n"
@@ -241,6 +245,8 @@ static void nb_parse(int argc, char **argv, nb_params *p, int is_cuda)
     p->every = 1;
     p->verify = 0;
     p->no_energy = 0;
+    p->sched = "static";
+    p->simd = 1;
 
     for (i = 1; i < argc; i++) {
         const char *a = argv[i];
@@ -253,6 +259,8 @@ static void nb_parse(int argc, char **argv, nb_params *p, int is_cuda)
         else if ((!strcmp(a, "-m") || !strcmp(a, "-k")) && has) p->mode = argv[++i];
         else if (!strcmp(a, "-t") && has) p->threads = atoi(argv[++i]);
         else if (!strcmp(a, "-b") && has) p->block = atoi(argv[++i]);
+        else if (!strcmp(a, "-sched") && has) p->sched = argv[++i];
+        else if (!strcmp(a, "-simd") && has) p->simd = atoi(argv[++i]);
         else if (!strcmp(a, "-o") && has) p->out = argv[++i];
         else if (!strcmp(a, "-every") && has) p->every = atoi(argv[++i]);
         else if (!strcmp(a, "-verify")) p->verify = 1;
