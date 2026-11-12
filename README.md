@@ -79,11 +79,19 @@ Mỗi lần chạy in một dòng `RESULT,impl,mode,n,steps,threads|block,time_s
 ## 5. Benchmark & đồ thị
 
 ```bash
-bash scripts/benchmark.sh          # -> results/results.csv
-python scripts/plot_results.py     # -> results/*.png + bảng Markdown cho báo cáo
+bash scripts/benchmark.sh          # -> results/results.csv (+ results.machine.txt: cấu hình máy)
+python scripts/plot_results.py     # -> results/*.png + results/summary.md
 ```
 
-Có thể chỉnh qua biến môi trường: `NS`, `THREADS`, `STEPS`, `CUDA_NS`, `BLOCKS`.
+Theo quy ước nhóm, CPU đo trên máy nhiều lõi, GPU đo trên Colab, rồi ghép lại khi vẽ:
+
+```bash
+OUT=results/cpu_laptop.csv SKIP_GPU=1 bash scripts/benchmark.sh   # trên laptop/PC
+OUT=results/gpu_t4.csv     SKIP_CPU=1 bash scripts/benchmark.sh   # trên Colab (notebook đã có sẵn)
+python scripts/plot_results.py results/cpu_laptop.csv results/gpu_t4.csv
+```
+
+Biến môi trường: `NS`, `THREADS`, `STEPS`, `REPS` (số lần lặp, lấy lần nhanh nhất; mặc định 3), `BIG_NS`/`BIG_STEPS` (N lớn chỉ đo tuần tự + OpenMP tối đa), `CUDA_NS`, `BLOCKS`, `SKIP_CPU`, `SKIP_GPU`.
 
 Trực quan hóa:
 

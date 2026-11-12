@@ -1,6 +1,7 @@
 bin/
 *.exe
 *.o
-results/*.csv
+results/traj*.csv
+results/*.gif
 __pycache__/
 .ipynb_checkpoints/

@@ -1,0 +1,7 @@
+Ngay do   : 2026-11-12 12:34
+He dieu hanh: MINGW64_NT-10.0-26300 3.6.9-b4195d69.x86_64
+CPU       : 12th Gen Intel(R) Core(TM) i5-12500H
+So loi    : 12
+So luong  : 16
+Compiler  : gcc.exe (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders) 12.1.0
+Tham so   : NS="1024 2048 4096 8192 16384" THREADS="1 2 4 8 12 16" STEPS=5 REPS=3 BIG_NS="32768 65536 131072" BIG_STEPS=1
