@@ -129,7 +129,7 @@ trong đó $P$ là tỷ lệ thời gian có thể song song hóa và $p$ là s�
 
 Các phép đo dưới đây dùng $N=2048$, 2000 bước, seed 42, chế độ OpenMP với 12 luồng. Ở thí nghiệm `dt`, giữ $\varepsilon=0.01$; ở thí nghiệm `eps`, giữ $\Delta t=0.002$. Năng lượng được tính trước và sau mô phỏng bằng thế năng mềm $U_\varepsilon$ nêu ở Mục 2.2.
 
-| Thí nghiệm | Giá trị thay đổi | $\Delta t$ | $\varepsilon$ | $|\Delta E/E_0|$ | Cấu hình máy |
+| Thí nghiệm | Giá trị thay đổi | $\Delta t$ | $\varepsilon$ | $\lvert\Delta E/E_0\rvert$ | Cấu hình máy |
 |---|---:|---:|---:|---:|---|
 | `dt` | 0.0005 | 0.0005 | 0.01 | 1.700e-05 | Intel Core i5-12450HX; 8 lõi/12 luồng; GCC 16.2; OpenMP 12 luồng |
 | `dt` | 0.001 | 0.001 | 0.01 | 1.750e-06 | Intel Core i5-12450HX; 8 lõi/12 luồng; GCC 16.2; OpenMP 12 luồng |
