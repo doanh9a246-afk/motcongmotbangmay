@@ -118,8 +118,8 @@ Môi trường thử nghiệm thực tế:
 
 1. **Hiệu ứng vượt trội của SIMD:**
    - Trên tất cả các giá trị $N$, việc bật SIMD (`#pragma omp simd reduction`) đem lại mức tăng tốc **1.88× đến 2.50×** (đạt **2.09× đến 2.38×** ở $N = 8192\text{--}16384$) so với bản vô hướng không có SIMD.
-   - Lưu ý: với `-O3 -ffast-math` GCC tự vector hóa, nên bản OFF được biên dịch với `no-tree-vectorize` (`__attribute__((optimize("no-tree-vectorize")))`) để đo đúng bản vô hướng.
-   - Lý do: Vòng lặp trong $j$ của bản SIMD ON được vector hóa thành các chỉ thị AVX2 256-bit (`vrsqrtps`), xử lý đồng thời 8 tương tác trong một chu kỳ lệnh thay vì xử lý tuần tự từng số vô hướng (`vsqrtss`/`vdivss`).
+   - Lưu ý: với `-O3 -ffast-math` GCC tự vector hóa, nên bản OFF được biên dịch với `no-tree-vectorize` (`__attribute__((optimize("no-tree-vectorize")))` trong `nb_body_acc_nosimd`) để đo đúng bản vô hướng. Kiểm tra bằng `-fopt-info-vec` cho thấy `nb_body_acc_nosimd` không còn bất kỳ dòng `vectorized` nào. Trên MinGW GCC 16.2.0 (`i7-13620H`), tốc độ bản OFF vô hướng thật (~90–98 GFLOP/s ở $N = 8192\text{--}16384$) xấp xỉ bản trước khi thêm `no-tree-vectorize` vì ở bản cũ trình biên dịch tự vector hóa với `unroll factor 32` gây tràn thanh ghi YMM ra stack (`vmovups`/`vfmadd213ps` truy cập stack), khiến hiệu năng bị nghẽn xuống ngang mức vô hướng.
+   - Lý do: Vòng lặp trong $j$ của bản SIMD ON được vector hóa thành các chỉ thị AVX2 256-bit (`vrsqrtps`), xử lý đồng thời 8 tương tác trong một chu kỳ lệnh thay vì xử lý tuần tự từng số vô hướng (`vsqrtss`/`vmulss`/`vdivss`).
 
 2. **Hiện tượng bất đối xứng trên kiến trúc CPU lai (Hybrid P/E Cores):**
    - Theo lý thuyết tính toán song song truyền thống, bài toán All-Pairs có khối lượng mỗi vòng lặp ngoài $i$ là hoàn toàn đồng đều ($N$ tương tác), nên `schedule(static)` được xem là tối ưu vì chi phí lập lịch bằng 0.
