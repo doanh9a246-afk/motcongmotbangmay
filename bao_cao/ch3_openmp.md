@@ -87,42 +87,43 @@ Môi trường thử nghiệm thực tế:
 
 | $N$ | Schedule | SIMD | Thời gian (ms/bước) | Hiệu năng (GFLOP/s) | Tăng tốc SIMD (lần) |
 |:---:|:---:|:---:|:---:|:---:|:---:|
-| **2048** | `static` | **ON** | **0.866** | **96.84** | **1.58×** |
-| 2048 | `static` | OFF | 1.368 | 61.32 | 1.00× (gốc) |
-| 2048 | `dynamic,64` | **ON** | **0.864** | **97.10** | **1.41×** |
-| 2048 | `dynamic,64` | OFF | 1.216 | 68.98 | 1.00× |
-| 2048 | `guided,64` | **ON** | **0.687** | **122.17** | **1.66×** |
-| 2048 | `guided,64` | OFF | 1.139 | 73.63 | 1.00× |
-| **4096** | `static` | **ON** | **2.072** | **161.93** | **1.96×** |
-| 4096 | `static` | OFF | 4.067 | 82.50 | 1.00× |
-| 4096 | `dynamic,64` | **ON** | **1.648** | **203.60** | **2.16×** |
-| 4096 | `dynamic,64` | OFF | 3.558 | 94.32 | 1.00× |
-| 4096 | `guided,64` | **ON** | **1.792** | **187.27** | **1.96×** |
-| 4096 | `guided,64` | OFF | 3.510 | 95.59 | 1.00× |
-| **8192** | `static` | **ON** | **7.147** | **187.81** | **2.26×** |
-| 8192 | `static` | OFF | 16.163 | 83.04 | 1.00× |
-| 8192 | `dynamic,64` | **ON** | **5.872** | **228.59** | **2.31×** |
-| 8192 | `dynamic,64` | OFF | 13.587 | 98.79 | 1.00× |
-| 8192 | `guided,64` | **ON** | **6.548** | **204.99** | **2.24×** |
-| 8192 | `guided,64` | OFF | 14.647 | 91.64 | 1.00× |
-| **16384** | `static` | **ON** | **27.997** | **191.76** | **2.16×** |
-| 16384 | `static` | OFF | 60.490 | 88.75 | 1.00× |
-| 16384 | `dynamic,64` | **ON** | **23.059** | **232.82** | **2.30×** |
-| 16384 | `dynamic,64` | OFF | 53.118 | 101.07 | 1.00× |
-| 16384 | `guided,64` | **ON** | **24.978** | **214.94** | **2.28×** |
-| 16384 | `guided,64` | OFF | 56.958 | 94.26 | 1.00× |
+| **2048** | `static` | **ON** | **0.546** | **153.54** | **2.50×** |
+| 2048 | `static` | OFF | 1.365 | 61.45 | 1.00× (gốc) |
+| 2048 | `dynamic,64` | **ON** | **0.581** | **144.36** | **1.93×** |
+| 2048 | `dynamic,64` | OFF | 1.123 | 74.71 | 1.00× |
+| 2048 | `guided,64` | **ON** | **0.567** | **147.92** | **2.06×** |
+| 2048 | `guided,64` | OFF | 1.169 | 71.79 | 1.00× |
+| **4096** | `static` | **ON** | **2.103** | **159.54** | **1.88×** |
+| 4096 | `static` | OFF | 3.947 | 85.02 | 1.00× |
+| 4096 | `dynamic,64` | **ON** | **1.586** | **211.55** | **2.39×** |
+| 4096 | `dynamic,64` | OFF | 3.783 | 88.71 | 1.00× |
+| 4096 | `guided,64` | **ON** | **1.797** | **186.73** | **2.03×** |
+| 4096 | `guided,64` | OFF | 3.648 | 91.98 | 1.00× |
+| **8192** | `static` | **ON** | **7.119** | **188.54** | **2.09×** |
+| 8192 | `static` | OFF | 14.867 | 90.28 | 1.00× |
+| 8192 | `dynamic,64` | **ON** | **5.849** | **229.46** | **2.38×** |
+| 8192 | `dynamic,64` | OFF | 13.930 | 96.35 | 1.00× |
+| 8192 | `guided,64` | **ON** | **6.437** | **208.51** | **2.21×** |
+| 8192 | `guided,64` | OFF | 14.243 | 94.23 | 1.00× |
+| **16384** | `static` | **ON** | **26.136** | **205.42** | **2.19×** |
+| 16384 | `static` | OFF | 57.268 | 93.75 | 1.00× |
+| 16384 | `dynamic,64` | **ON** | **23.148** | **231.93** | **2.37×** |
+| 16384 | `dynamic,64` | OFF | 54.891 | 97.81 | 1.00× |
+| 16384 | `guided,64` | **ON** | **25.437** | **211.06** | **2.26×** |
+| 16384 | `guided,64` | OFF | 57.507 | 93.36 | 1.00× |
 
 ![So sánh Schedule và SIMD](results/ntduong_schedule_simd.png)
 
 ### Phân tích chuyên sâu về Schedule và SIMD
 
 1. **Hiệu ứng vượt trội của SIMD:**
-   - Trên tất cả các giá trị $N$, việc bật SIMD (`#pragma omp simd reduction`) đem lại mức tăng tốc **2.16× đến 2.31×** so với bản không có SIMD.
-   - Lý do: Vòng lặp trong $j$ được vector hóa hoàn hảo thành các chỉ thị AVX2 256-bit. CPU xử lý đồng thời 8 tương tác trong 1 chu kỳ lệnh thay vì xử lý tuần tự từng số vô hướng (scalar).
+   - Trên tất cả các giá trị $N$, việc bật SIMD (`#pragma omp simd reduction`) đem lại mức tăng tốc **1.88× đến 2.50×** (đạt **2.09× đến 2.38×** ở $N = 8192\text{--}16384$) so với bản vô hướng không có SIMD.
+   - Lưu ý: với `-O3 -ffast-math` GCC tự vector hóa, nên bản OFF được biên dịch với `no-tree-vectorize` (`__attribute__((optimize("no-tree-vectorize")))` trong `nb_body_acc_nosimd`) để đo đúng bản vô hướng. Kiểm tra bằng `-fopt-info-vec` cho thấy `nb_body_acc_nosimd` không còn bất kỳ dòng `vectorized` nào. Trên MinGW GCC 16.2.0 (`i7-13620H`), tốc độ bản OFF vô hướng thật (~90–98 GFLOP/s ở $N = 8192\text{--}16384$) xấp xỉ bản trước khi thêm `no-tree-vectorize` vì ở bản cũ trình biên dịch tự vector hóa với `unroll factor 32` gây tràn thanh ghi YMM ra stack (`vmovups`/`vfmadd213ps` truy cập stack), khiến hiệu năng bị nghẽn xuống ngang mức vô hướng.
+   - Lý do: Vòng lặp trong $j$ của bản SIMD ON được vector hóa thành các chỉ thị AVX2 256-bit (`vrsqrtps`), xử lý đồng thời 8 tương tác trong một chu kỳ lệnh thay vì xử lý tuần tự từng số vô hướng (`vsqrtss`/`vmulss`/`vdivss`).
 
 2. **Hiện tượng bất đối xứng trên kiến trúc CPU lai (Hybrid P/E Cores):**
    - Theo lý thuyết tính toán song song truyền thống, bài toán All-Pairs có khối lượng mỗi vòng lặp ngoài $i$ là hoàn toàn đồng đều ($N$ tương tác), nên `schedule(static)` được xem là tối ưu vì chi phí lập lịch bằng 0.
-   - Tuy nhiên, số liệu thực nghiệm trên vi xử lý Intel Core i7-13620H lại chỉ ra: **`schedule(dynamic, 64)` nhanh hơn `schedule(static)` rõ rệt** (với $N=16384$, `dynamic` đạt **232.82 GFLOP/s**, trong khi `static` chỉ đạt **191.76 GFLOP/s** — chênh lệch hơn 21%).
+   - Tuy nhiên, số liệu thực nghiệm trên vi xử lý Intel Core i7-13620H lại chỉ ra: **`schedule(dynamic, 64)` nhanh hơn `schedule(static)` rõ rệt** (với $N=16384$, `dynamic` đạt **231.93 GFLOP/s**, trong khi `static` đạt **205.42 GFLOP/s** — chênh lệch ~13%; và với $N=4096\text{--}8192$ đạt **211.55–229.46 GFLOP/s**, nhanh hơn `static` tới 21%–33%).
    - **Giải thích cơ chế vật lý:** CPU Intel thế hệ 13 sở hữu 2 loại lõi khác nhau:
      - 6 lõi P (Performance Core): Kiến trúc Raptor Cove, IPC cao, xung nhịp Turbo lên tới 4.9 GHz.
      - 4 lõi E (Efficient Core): Kiến trúc Gracemont, IPC thấp hơn, xung nhịp tối đa chỉ 3.6 GHz.
@@ -268,8 +269,8 @@ Hiện tượng này không phải do cài đặt sai mà bắt nguồn từ cá
    - Phiên bản OpenMP All-Pairs đạt mức tăng tốc tối đa **5.91×** tại 16 luồng ($N=8192$), nâng hiệu năng tính toán CPU lên mức **201.14 GFLOP/s** (so với 34 GFLOP/s của bản tuần tự).
    - Kiểm tra tính đúng đắn (`-verify`) cho thấy kết quả song song khớp hoàn toàn từng bit với bản tuần tự (sai số tương đối $0.000\text{e}+00$), và năng lượng toàn phần được bảo toàn nghiêm ngặt ($|\Delta E / E_0| \approx 8.78 \times 10^{-7}$).
 2. **Vai trò then chốt của SIMD:**
-   - Vector hóa SIMD thông qua `#pragma omp simd reduction` mang lại mức cải thiện hiệu năng then chốt **2.2× đến 2.6×**, chứng minh tầm quan trọng của việc kết hợp đa luồng cấp lõi (multithreading) với song song hóa cấp lệnh (SIMD instruction-level parallelism).
+   - Vector hóa SIMD thông qua `#pragma omp simd reduction` mang lại mức cải thiện hiệu năng then chốt **1.9× đến 2.5×** so với bản vô hướng thực thụ (`no-tree-vectorize`), chứng minh tầm quan trọng của việc kết hợp đa luồng cấp lõi (multithreading) với song song hóa cấp lệnh (SIMD instruction-level parallelism).
 3. **Bài học về lập lịch trên CPU lai:**
-   - Trên các dòng CPU kiến trúc lai hiện đại (Intel Core gen 12/13/14), `schedule(dynamic)` giúp cân bằng tải vượt trội giữa nhân P và nhân E, mang lại hiệu năng cao hơn `schedule(static)` tới 21%.
+   - Trên các dòng CPU kiến trúc lai hiện đại (Intel Core gen 12/13/14), `schedule(dynamic)` giúp cân bằng tải vượt trội giữa nhân P và nhân E, mang lại hiệu năng cao hơn `schedule(static)` từ **13% đến 33%** (tùy kích thước $N$).
 4. **Bài học từ Định luật 3 Newton:**
    - Việc giảm một nửa số phép tính toán học ($N^2/2$) không đồng nghĩa với việc tăng tốc độ thực tế. Chi phí bộ đệm cục bộ (4 MB), xung đột cache, mất vector hóa SIMD và chi phí reduction đã khiến bản Newton 3 chậm hơn bản All-Pairs tiêu chuẩn. Đây là minh chứng rõ ràng cho việc: **Trong tính toán hiện đại, cấu trúc dữ liệu thân thiện với bộ nhớ đệm (Cache-Friendly) và vector hóa SIMD quan trọng hơn số lượng phép tính thuần túy.**
