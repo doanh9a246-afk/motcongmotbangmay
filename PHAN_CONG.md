@@ -52,6 +52,7 @@ Mỗi người tự thuyết trình phần của mình (~5 phút/người).
 
 ## Quy ước làm việc
 - Mỗi người làm trên nhánh riêng (`git checkout -b <ten>/<viec>`), tạo Pull Request; nhóm trưởng review rồi merge vào `main`.
+- `main` đã khóa: không ai push thẳng được. PR chỉ merge được khi **CI xanh** (3 kiểm tra `cpu`, `cuda`, `scripts` trong `.github/workflows/ci.yml`) **và có 1 người approve**. Nếu CI đỏ, mở tab *Checks* của PR để xem lỗi.
 - Số liệu GPU đo trên **Colab T4**. Số liệu CPU/OpenMP đo trên **máy nhiều lõi thật** (laptop/PC), không dùng Colab vì Colab chỉ có 2 vCPU. Luôn ghi rõ cấu hình máy (CPU, số lõi/luồng, trình biên dịch) cạnh mỗi bảng số liệu.
 - Khi so sánh GPU với CPU trong Ch.5, dùng số liệu CPU tốt nhất (OpenMP trên máy nhiều lõi), không dùng CPU của Colab.
 - Không dán token/mật khẩu vào notebook, code hay ảnh chụp gửi nhóm. Repo đã public nên clone không cần token.
