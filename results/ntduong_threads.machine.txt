@@ -1,0 +1,8 @@
+Nguoi thuc hien : Nguyen Tung Duong
+Ngay do        : 2026-11-12 22:32
+He dieu hanh   : Windows 11 (10.0.26200)
+CPU            : 13th Gen Intel(R) Core(TM) i7-13620H
+So loi         : 10 (6P + 4E)
+So luong       : 16
+Compiler       : gcc (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders, r2) 16.2.0
+Tham so        : NS="2048 4096 8192 16384" THREADS="1 2 4 8 16" STEPS=5 REPS=3
