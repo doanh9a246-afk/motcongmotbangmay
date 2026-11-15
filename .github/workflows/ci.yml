@@ -1,0 +1,74 @@
+# CI: moi Pull Request vao main phai qua 3 kiem tra nay moi merge duoc
+#   cpu      build ban CPU (warning = loi), OpenMP phai khop tuan tu, nang luong duoc bao toan
+#   cuda     bien dich ban CUDA (runner khong co GPU nen chi kiem tra compile)
+#   scripts  chay thu benchmark.sh, plot_results.py, visualize.py va kiem tra notebook
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cpu:
+    name: cpu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build (warning = loi)
+        run: make CFLAGS="-O3 -march=native -ffast-math -Wall -Wextra -Werror"
+      - name: Verify OpenMP == tuan tu
+        run: |
+          for t in 1 2 4; do
+            ./bin/nbody_cpu -n 2048 -s 5 -m omp -t $t -verify | tee out.txt
+            grep -q -- '-> PASS' out.txt || { echo "::error::OpenMP $t luong khong khop tuan tu"; exit 1; }
+          done
+      - name: Bao toan nang luong (|dE/E0| < 1e-3 sau 1000 buoc)
+        run: |
+          ./bin/nbody_cpu -n 1024 -s 1000 -dt 0.001 | tee out.txt
+          de=$(grep -o 'dE/E0| = [0-9.e+-]*' out.txt | awk '{print $3}')
+          echo "|dE/E0| = $de"
+          awk -v d="$de" 'BEGIN{exit !(d < 1e-3)}' || { echo "::error::Sai so nang luong qua lon: $de"; exit 1; }
+
+  cuda:
+    name: cuda
+    runs-on: ubuntu-latest
+    container: nvidia/cuda:12.4.1-devel-ubuntu22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cai make
+        run: apt-get update -qq && apt-get install -y -qq make > /dev/null
+      - name: Bien dich CUDA cho T4 (sm_75)
+        run: make ARCH=sm_75 cuda
+
+  scripts:
+    name: scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q matplotlib
+      - name: Kiem tra cu phap shell
+        run: bash -n scripts/benchmark.sh
+      - name: Chay thu benchmark + ve do thi
+        run: |
+          make
+          OUT=/tmp/ci/smoke.csv SKIP_GPU=1 NS="256 512" THREADS="1 2" BIG_NS="1024" REPS=1 STEPS=2 \
+            bash scripts/benchmark.sh
+          python scripts/plot_results.py /tmp/ci/smoke.csv results/cpu_laptop.csv
+          test -s /tmp/ci/summary.md && test -s /tmp/ci/time_vs_n.png
+      - name: Chay thu visualize
+        run: |
+          ./bin/nbody_cpu -n 128 -s 20 -o /tmp/ci/traj.csv -every 5 -noenergy
+          python scripts/visualize.py /tmp/ci/traj.csv --gif
+          test -s /tmp/ci/nbody.gif
+      - name: Notebook hop le
+        run: python -c "import json; json.load(open('notebooks/nbody_colab.ipynb', encoding='utf-8'))"
