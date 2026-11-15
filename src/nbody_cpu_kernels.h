@@ -13,6 +13,17 @@
 #define NB_UNUSED
 #endif
 
+/*
+ * Tat han vector hoa cho ham. Voi -O3 -ffast-math, GCC van TU vector hoa vong lap
+ * du khong co "#pragma omp simd" (xem -fopt-info-vec), nen can thuoc tinh nay de
+ * ban "-simd 0" thuc su la ban vo huong (scalar).
+ */
+#if defined(__GNUC__) && !defined(__clang__)
+#define NB_NO_VECTORIZE __attribute__((optimize("no-tree-vectorize")))
+#else
+#define NB_NO_VECTORIZE
+#endif
+
 /* So luong OpenMP cho cac nhan tinh toan (0 = mac dinh he thong). */
 static int nb_omp_threads = 0;
 
@@ -54,8 +65,9 @@ static inline void nb_body_acc(const vec4f *__restrict__ pos, vec4f *__restrict_
     acc[i].w = 0.0f;
 }
 
-/* Gia toc cua vat the i khong dung chi thi SIMD (de so sanh anh huong cua vector hoa). */
-static inline void nb_body_acc_nosimd(const vec4f *__restrict__ pos, vec4f *__restrict__ acc,
+/* Gia toc cua vat the i KHONG vector hoa (ban vo huong, de so sanh anh huong cua SIMD). */
+NB_NO_VECTORIZE
+static void nb_body_acc_nosimd(const vec4f *__restrict__ pos, vec4f *__restrict__ acc,
                                       int i, int n, float eps2)
 {
     const float xi = pos[i].x, yi = pos[i].y, zi = pos[i].z;
