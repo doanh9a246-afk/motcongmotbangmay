@@ -1,6 +1,6 @@
 # Chương 1. Giới thiệu
 
-*Người viết: Nguyễn Quốc Doanh — bản nháp*
+*Người viết: Nguyễn Quốc Doanh*
 
 ## 1.1. Đặt vấn đề
 
