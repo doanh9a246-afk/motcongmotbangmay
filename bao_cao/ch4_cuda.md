@@ -330,7 +330,9 @@ Dù vậy, Tiled vẫn duy trì ưu thế về thời gian thực thi trên toà
 
 Để xác định kích thước Block phù hợp, chương trình tiến hành thử nghiệm bốn cấu hình \(B=64,128,256,512\) tại \(N=131.072\).
 
-| Block Size (B) | Thời gian thực thi (ms) | Thông lượng tương tác (GInter/s) | Hiệu năng (GFLOP/s) |
+Thời gian thực thi trong bảng được tính cho 5 bước mô phỏng (STEPS = 5).
+
+| Block Size (B) | Thời gian thực thi (ms/5 bước) | Thông lượng tương tác (GInter/s) | Hiệu năng (GFLOP/s) |
 |---:|---:|---:|---:|
 | 64 | 450,288 | 190,77 | 3.815,31 |
 | 128 | 449,339 | 191,17 | 3.823,36 |
