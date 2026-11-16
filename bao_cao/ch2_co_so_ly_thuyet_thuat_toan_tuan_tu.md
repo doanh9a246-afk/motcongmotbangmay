@@ -142,7 +142,17 @@ Các phép đo dưới đây dùng $N=2048$, 2000 bước, seed 42, chế độ 
 | `eps` | 0.0316228 | 0.002 | 0.0316228 | 1.816e-05 | Intel Core i5-12450HX; 8 lõi/12 luồng; GCC 16.2; OpenMP 12 luồng |
 | `eps` | 0.1 | 0.002 | 0.1 | 6.772e-06 | Intel Core i5-12450HX; 8 lõi/12 luồng; GCC 16.2; OpenMP 12 luồng |
 
-Đồ thị log–log tương ứng được lưu tại [`results/vvduong_energy_dt.png`](../results/vvduong_energy_dt.png) và [`results/vvduong_energy_eps.png`](../results/vvduong_energy_eps.png). Dữ liệu thô, gồm cả cấu hình máy và tham số từng lần chạy, nằm trong [`results/vvduong_energy.csv`](../results/vvduong_energy.csv).
+Đồ thị log–log tương ứng là Hình 2.1 và Hình 2.2 (tệp `results/vvduong_energy_dt.png`, `results/vvduong_energy_eps.png`).
+
+![Độ lệch năng lượng theo bước thời gian](../results/vvduong_energy_dt.png)
+
+*Hình 2.1. Độ lệch năng lượng $|\Delta E/E_0|$ theo $\Delta t$ ($\varepsilon=0.01$).*
+
+![Độ lệch năng lượng theo softening](../results/vvduong_energy_eps.png)
+
+*Hình 2.2. Độ lệch năng lượng $|\Delta E/E_0|$ theo $\varepsilon$ ($\Delta t=0.002$).*
+
+Dữ liệu thô, gồm cả cấu hình máy và tham số từng lần chạy, nằm trong [`results/vvduong_energy.csv`](../results/vvduong_energy.csv).
 
 Khi tăng $\Delta t$ từ 0.002 lên 0.005 và 0.01, độ lệch năng lượng cuối tăng từ $2.685\times10^{-6}$ lên $9.308\times10^{-5}$ và $1.260\times10^{-3}$. Kết quả ở $\Delta t=0.0005$ không nhỏ hơn mọi giá trị khác: $1.700\times10^{-5}$, lớn hơn các giá trị tại 0.001 và 0.002. Điều này cho thấy độ lệch tại một thời điểm cuối không nhất thiết đơn điệu theo bước thời gian; năng lượng của tích phân symplectic có thể dao động và kết quả còn phụ thuộc pha tại thời điểm đo.
 
