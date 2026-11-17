@@ -112,7 +112,9 @@ Môi trường thử nghiệm thực tế:
 | 16384 | `guided,64` | **ON** | **25.437** | **211.06** | **2.26×** |
 | 16384 | `guided,64` | OFF | 57.507 | 93.36 | 1.00× |
 
-![So sánh Schedule và SIMD](results/ntduong_schedule_simd.png)
+![So sánh Schedule và SIMD](../results/ntduong_schedule_simd.png)
+
+*Hình 3.1. So sánh các chế độ schedule, có và không có SIMD (16 luồng).*
 
 ### Phân tích chuyên sâu về Schedule và SIMD
 
@@ -183,7 +185,9 @@ for (i = 0; i < n; i++) {
 | 16384 | 8 | 31.526 | 60.997 | 0.52× | All-Pairs nhanh hơn 1.93× |
 | 16384 | 16 | **25.537** | **41.603** | **0.61×** | **All-Pairs nhanh hơn 1.63×** |
 
-![So sánh All-Pairs và Newton 3](results/ntduong_newton3_comparison.png)
+![So sánh All-Pairs và Newton 3](../results/ntduong_newton3_comparison.png)
+
+*Hình 3.2. So sánh All-Pairs và biến thể định luật 3 Newton.*
 
 ### 4. Phân tích nguyên nhân vì sao Định luật 3 Newton chạy chậm hơn All-Pairs
 
@@ -235,7 +239,9 @@ Dưới đây là bảng số liệu đo đạc chính thức của Nguyễn Tù
 | 16384 | 8 | 0.165322 | 33.064 | 162.37 | 4.68× | 58.5% |
 | 16384 | 16 | **0.138587** | **27.717** | **193.69** | **5.58×** | **34.9%** |
 
-![Speedup và Hiệu suất OpenMP](results/ntduong_threads_speedup.png)
+![Speedup và Hiệu suất OpenMP](../results/ntduong_threads_speedup.png)
+
+*Hình 3.3. Speedup và hiệu suất OpenMP theo số luồng.*
 
 ### Phân tích hiện tượng Speedup thực tế < Lý tưởng 16×
 

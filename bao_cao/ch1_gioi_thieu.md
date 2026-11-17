@@ -31,7 +31,8 @@ Mặt khác, các tương tác trong cùng một bước **hoàn toàn độc l�
 - Chỉ xét thuật toán trực tiếp O(N²); các thuật toán xấp xỉ như Barnes–Hut O(N log N) hay Fast Multipole Method chỉ được nêu ở phần hướng phát triển.
 - Dùng số thực độ chính xác đơn (`float`), giống GPU Gems 3.
 - Phần cứng thử nghiệm:
-  - CPU: laptop Intel Core i5-12500H (12 lõi gồm 4 lõi P và 8 lõi E, 16 luồng), MinGW gcc 12.1;
+  - CPU (benchmark tổng hợp ở Chương 5): laptop Intel Core i5-12500H (12 lõi gồm 4 lõi P và 8 lõi E, 16 luồng), MinGW gcc 12.1;
+  - các thí nghiệm riêng của Chương 2 (Intel Core i5-12450HX) và Chương 3 (Intel Core i7-13620H) đo trên máy của từng thành viên, cấu hình ghi cạnh mỗi bảng;
   - GPU: NVIDIA Tesla T4 trên Google Colab (40 SM, kiến trúc Turing, sm_75).
 - Số liệu CPU và GPU được đo trên hai máy khác nhau. Vì vậy phép so sánh CPU–GPU ở Chương 5 mang tính tham khảo về bậc độ lớn, không phải so sánh trên cùng một hệ thống.
 

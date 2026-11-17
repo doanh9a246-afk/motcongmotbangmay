@@ -35,14 +35,17 @@
 
 *Bảng 5.2 — Hiệu năng tính theo quy ước 20 FLOP/tương tác của GPU Gems 3.*
 
-Hình 5.1 — `results/time_vs_n.png`: thời gian / bước theo N (log–log).
-Hình 5.2 — `results/gpu_speedup.png`: speedup của các phiên bản so với tuần tự.
+![Thời gian mỗi bước theo N](../results/time_vs_n.png)
+
+*Hình 5.1 — Thời gian / bước theo N (log–log), `results/time_vs_n.png`.*
+
+Speedup của các phiên bản so với tuần tự được vẽ ở Hình 4.1 (`results/gpu_speedup.png`).
 
 ## 5.3. Nhận xét
 
 **Độ phức tạp O(N²).** Trên Hình 5.1 (thang log–log), mỗi lần N tăng gấp đôi thì thời gian tuần tự tăng khoảng 4 lần (ví dụ 39.4 → 158.0 → 693.9 ms), tức độ dốc ≈ 2, đúng với độ phức tạp O(N²) của thuật toán all-pairs. Đường OpenMP và hai đường CUDA cũng có độ dốc ≈ 2 khi N đủ lớn; các phiên bản song song chỉ dịch đường thẳng xuống dưới, không làm thay đổi bậc của bài toán.
 
-**OpenMP.** Với 16 luồng, OpenMP nhanh hơn tuần tự 4.4–4.8× khi N ≥ 8192 trong lần đo tổng hợp này; thí nghiệm riêng ở Chương 3 đạt tối đa 5.91× (N = 8192). Con số này thấp hơn nhiều so với 16× lý tưởng vì i5-12500H chỉ có 4 lõi P (có siêu phân luồng) và 8 lõi E chậm hơn, đồng thời xung nhịp turbo giảm khi nhiều lõi cùng chạy (phân tích chi tiết ở mục 3.5). Với N nhỏ (1024–2048), chi phí tạo và đồng bộ luồng chiếm tỉ lệ lớn nên speedup chỉ 1.6–2.1×.
+**OpenMP.** Với 16 luồng, OpenMP nhanh hơn tuần tự 4.4–4.8× khi N ≥ 8192 trong lần đo tổng hợp này; thí nghiệm riêng ở Chương 3, đo trên một máy khác (i7-13620H, 6P + 4E, 16 luồng), đạt tối đa 5.91× (N = 8192). Cả hai con số đều thấp hơn nhiều so với 16× lý tưởng vì i5-12500H chỉ có 4 lõi P (có siêu phân luồng) và 8 lõi E chậm hơn, đồng thời xung nhịp turbo giảm khi nhiều lõi cùng chạy (phân tích chi tiết ở mục 3.5). Với N nhỏ (1024–2048), chi phí tạo và đồng bộ luồng chiếm tỉ lệ lớn nên speedup chỉ 1.6–2.1×.
 
 **GPU so với CPU.** CUDA tiled trên Tesla T4 nhanh hơn bản tuần tự 125–142× và nhanh hơn OpenMP 16 luồng 28–35× khi N ≥ 8192. Với N nhỏ, lợi thế giảm còn 15× (N = 1024): lưới chỉ có 4 block 256 luồng, không đủ để lấp đầy 40 SM của T4, nên phần lớn GPU không có việc để làm. Đây là lý do đường CUDA trên Hình 5.1 thoải hơn (độ dốc < 2) ở vùng N ≤ 8192.
 

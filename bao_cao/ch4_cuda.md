@@ -1,6 +1,6 @@
-*Người viết: Trần Tiến Đạt*
+# Chương 4. Song song hóa bài toán N-body trên GPU với CUDA
 
-# CHƯƠNG 4: SONG SONG HÓA BÀI TOÁN N-BODY TRÊN GPU VỚI CUDA
+*Người viết: Trần Tiến Đạt*
 
 ## 4.1. Kiến trúc GPU NVIDIA Tesla T4
 

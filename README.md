@@ -100,6 +100,15 @@ Trực quan hóa:
 python scripts/visualize.py results/traj.csv --gif
 ```
 
+Báo cáo PDF (ghép trang bìa, mục lục, Ch.1–Ch.5, tài liệu tham khảo):
+
+```bash
+pip install markdown pypdf
+python scripts/build_report.py     # -> bao_cao/bao_cao_nhom.pdf (cần Chrome/Edge và mạng để tải KaTeX)
+```
+
+Thông tin trường / học phần / giảng viên trên trang bìa sửa ở biến `COVER` trong `scripts/build_report.py`.
+
 ## 6. Kết quả thử nghiệm sơ bộ (CPU)
 
 Laptop 16 luồng, MinGW gcc 12.1, 5 bước. Số liệu laptop dao động mạnh (turbo, nhân P/E) — **chỉ để tham khảo**; số liệu chính thức cho báo cáo sẽ đo lại theo [PHAN_CONG.md](PHAN_CONG.md).
@@ -134,6 +143,7 @@ src/nbody_common.h        khởi tạo Plummer, năng lượng, tham số, đo t
 src/nbody_cpu_kernels.h   nhân tính toán tuần tự + OpenMP (cũng là tham chiếu cho CUDA)
 src/nbody_cpu.c           chương trình CPU
 src/nbody_cuda.cu         chương trình CUDA (naive + tiled)
-scripts/                  benchmark.sh, plot_results.py, visualize.py
+scripts/                  benchmark.sh, plot_results.py, visualize.py, build_report.py
+bao_cao/                  ch1..ch5 (Markdown), bao_cao_nhom.pdf, slide_nhom.pptx
 notebooks/                nbody_colab.ipynb
 ```
