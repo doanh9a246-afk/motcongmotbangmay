@@ -144,7 +144,7 @@ if (parallel) nb_acc_omp(pos, acc, n, eps2);  // warm-up, không tính giờ
 
 Thí nghiệm đo trên Intel Core i7-13620H (6 lõi P + 4 lõi E, 16 luồng), mỗi cấu hình chạy 3 lần lấy giá trị tốt nhất. Speedup $S_p$ và hiệu suất $E_p$ tính theo \eqref{eq:speedup}, với $T_1$ là thời gian bản tuần tự (Bảng~\ref{tab:omp-threads}, Hình~\ref{fig:ntduong_threads_speedup}).
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering\small
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{ccccccc}
