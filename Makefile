@@ -19,6 +19,7 @@ CUDA_BIN := bin/nbody_cuda$(EXE)
 HDRS     := src/nbody_common.h src/nbody_cpu_kernels.h
 
 .PHONY: cpu cuda all clean report slide docs
+.DEFAULT_GOAL := cpu
 
 # Bao cao va slide LaTeX (can XeLaTeX: MiKTeX hoac TeX Live, font Times New Roman/Consolas/Arial)
 LATEX_DIR := bao_cao/latex

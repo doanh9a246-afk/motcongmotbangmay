@@ -17,6 +17,12 @@ Cách dùng mỗi file:
 3. **Câu hỏi có thể gặp:** tự trả lời thành tiếng trước khi đọc đáp án.
 4. **Code cần biết:** mở file trong `src/` và đọc đúng các dòng được chỉ. Thầy/cô hay hỏi "chỉ cho tôi đoạn code đó".
 
+> **Nếu phải demo trên laptop Windows (MinGW gcc 12.1):** đừng dùng `-t <số luồng>` khi đang tính năng lượng. Chương trình có thể crash vì lỗi của libgomp khi số luồng thay đổi giữa các vùng song song. Đặt số luồng bằng biến môi trường:
+> ```powershell
+> $env:OMP_NUM_THREADS=4; .\bin\nbody_cpu.exe -n 8192 -s 5 -m omp -verify
+> ```
+> hoặc thêm `-noenergy`. Trên Linux/CI và GCC 16.2 không gặp lỗi này.
+
 ---
 
 ## Ai cũng phải trả lời được
