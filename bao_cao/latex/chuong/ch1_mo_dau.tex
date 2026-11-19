@@ -1,0 +1,164 @@
+\chapter{Mở đầu}
+\label{chap:mo-dau}
+
+\section{Tính cấp thiết của đề tài}
+\label{sec:cap-thiet}
+
+Bài toán N-body mô phỏng chuyển động của $N$ vật thể tương tác với nhau qua một lực tầm xa, điển hình là lực hấp dẫn Newton. Mỗi vật thể chịu lực hút từ tất cả $N-1$ vật thể còn lại, nên để cập nhật trạng thái hệ sau một bước thời gian theo cách trực tiếp (\emph{all-pairs}) cần tính $N^2$ tương tác. Với $N=10^5$ vật thể, một bước đã cần khoảng $10^{10}$ tương tác, tương đương $2\cdot10^{11}$ phép tính dấu phẩy động (theo quy ước 20 FLOP/tương tác của GPU Gems 3~\cite{gpugems3}). Một mô phỏng có ý nghĩa vật lý thường cần hàng nghìn đến hàng triệu bước. Với tốc độ khoảng 34 GFLOP/s đo được trên một lõi CPU (Chương~\ref{chap:thuc-nghiem}), riêng $10^4$ bước cho $N=10^5$ đã mất khoảng 16 giờ; với $N=10^6$ con số này tăng thêm 100 lần, tức hơn hai tháng.
+
+Nhu cầu mô phỏng hệ lớn hơn, lâu hơn và nhanh hơn ngày càng tăng trong thiên văn học, hóa học tính toán hay đồ họa. Trong khi đó, xung nhịp của một lõi CPU gần như không còn tăng từ giữa những năm 2000. Hiệu năng của phần cứng hiện nay chủ yếu đến từ \emph{song song}: CPU có hàng chục lõi, mỗi lõi có lệnh vector SIMD xử lý 8--16 số thực cùng lúc, và GPU có hàng nghìn nhân tính toán. Muốn khai thác được phần cứng đó, chương trình phải được thiết kế lại theo hướng song song. Vì vậy, nắm vững cách song song hóa một bài toán tính toán nặng là kỹ năng cấp thiết đối với người làm tính toán hiệu năng cao.
+
+Bài toán N-body rất phù hợp để nghiên cứu vấn đề này. Các tương tác trong cùng một bước \textbf{hoàn toàn độc lập} với nhau: gia tốc của vật thể $i$ chỉ phụ thuộc vào vị trí của các vật thể ở đầu bước, không phụ thuộc gia tốc của vật thể khác. N-body vì vậy là bài toán \emph{song song dữ liệu} (data-parallel) điển hình, có cường độ tính toán cao ($O(N^2)$ phép tính trên $O(N)$ dữ liệu), phù hợp với cả CPU đa lõi lẫn GPU. Đồng thời, bài toán vẫn đặt ra những vấn đề thực tế của tính toán song song: cân bằng tải trên CPU lai, tận dụng bộ nhớ đệm, đồng bộ luồng và chi phí truyền dữ liệu giữa CPU và GPU. Đây là lý do nhóm chọn đề tài \emph{Song song hóa mô phỏng N-body bằng OpenMP và CUDA}.
+
+\section{Ứng dụng của mô phỏng N-body}
+
+\begin{itemize}
+\item \textbf{Vật lý thiên văn:} sự tiến hóa của cụm sao, va chạm thiên hà, hình thành cấu trúc vũ trụ quy mô lớn (các mô phỏng như Millennium Simulation dùng tới hàng tỷ hạt).
+\item \textbf{Động lực học phân tử:} lực Coulomb và Lennard-Jones giữa các nguyên tử có cùng dạng ``mỗi hạt tương tác với mọi hạt khác''.
+\item \textbf{Cơ học thiên thể:} quỹ đạo hành tinh, tiểu hành tinh, tàu vũ trụ.
+\item \textbf{Đồ họa máy tính và trò chơi:} hệ hạt (particle system), mô phỏng chất lỏng theo phương pháp SPH.
+\item \textbf{Bài toán chuẩn (benchmark) cho tính toán hiệu năng cao:} N-body all-pairs là ví dụ kinh điển để đánh giá sức mạnh tính toán của phần cứng song song~\cite{gpugems3}.
+\end{itemize}
+
+\section{Mục tiêu đề tài}
+
+\begin{enumerate}
+\item Cài đặt thuật toán N-body all-pairs với tích phân Euler đối xứng (symplectic Euler), khởi tạo theo mô hình cụm sao Plummer.
+\item Xây dựng \textbf{bốn phiên bản} có cùng đầu vào và đầu ra:
+\begin{itemize}
+\item tuần tự (1 luồng CPU) làm mốc so sánh;
+\item song song trên CPU đa lõi bằng \textbf{OpenMP};
+\item song song trên GPU bằng \textbf{CUDA} theo hai cách: \emph{naive} (đọc trực tiếp từ bộ nhớ toàn cục) và \emph{tiled} (dùng shared memory theo GPU Gems 3).
+\end{itemize}
+\item Kiểm tra tính đúng đắn: các phiên bản cho cùng kết quả (trong phạm vi sai số làm tròn), năng lượng toàn phần được bảo toàn.
+\item Đo và phân tích hiệu năng: thời gian theo $N$, speedup và hiệu suất theo số luồng, ảnh hưởng của kích thước block, so sánh CPU với GPU, đối chiếu với cơ sở lý thuyết ở Chương~\ref{chap:ly-thuyet}.
+\end{enumerate}
+
+\section{Phạm vi và giới hạn}
+
+\begin{itemize}
+\item Chỉ xét thuật toán trực tiếp $O(N^2)$; các thuật toán xấp xỉ như Barnes--Hut $O(N\log N)$~\cite{barnes1986} hay Fast Multipole Method chỉ được nêu ở phần hướng phát triển.
+\item Dùng số thực độ chính xác đơn (\code{float}), giống GPU Gems 3.
+\item CPU được đo trên laptop của các thành viên (Intel thế hệ 12--13, kiến trúc lai lõi P/lõi E), GPU là NVIDIA Tesla T4 trên Google Colab. Do CPU và GPU nằm trên hai máy khác nhau, phép so sánh CPU--GPU mang tính tham khảo về bậc độ lớn, không phải so sánh trên cùng một hệ thống. Cấu hình chi tiết ở Mục~\ref{sec:moi-truong}.
+\end{itemize}
+
+\section{Cơ sở lý thuyết của bài toán N-body}
+\label{sec:co-so-bai-toan}
+
+Mục này trình bày mô hình vật lý, phương pháp tích phân số, cách khởi tạo dữ liệu và thuật toán tuần tự. Đây là nền tảng chung cho cả bốn phiên bản cài đặt; phần lý thuyết về tính toán song song được trình bày ở Chương~\ref{chap:ly-thuyet}.
+
+\subsection{Mô hình bài toán N-body}
+
+Xét hệ gồm $N$ vật thể, vật thể $i$ có khối lượng $m_i$, vị trí $\mathbf{r}_i$ và vận tốc $\mathbf{v}_i$. Theo định luật vạn vật hấp dẫn Newton, lực tác dụng lên vật thể $i$ là tổng lực do các vật thể còn lại gây ra. Viết dưới dạng gia tốc:
+\begin{equation}
+\mathbf{a}_i = G\sum_{j\ne i}m_j \frac{\mathbf{r}_j-\mathbf{r}_i}{\lVert\mathbf{r}_j-\mathbf{r}_i\rVert^3}.
+\label{eq:newton}
+\end{equation}
+Trong công thức này, $G$ là hằng số hấp dẫn. Khi mô phỏng trực tiếp, mỗi gia tốc cần xét gần $N$ vật thể; tính gia tốc cho toàn hệ vì vậy cần $N^2$ tương tác trong một bước thời gian. Đây là thuật toán \emph{all-pairs}, có độ phức tạp $O(N^2)$ mỗi bước.
+
+\subsection{Softening và năng lượng}
+
+Nếu hai vật thể tiến rất gần nhau, mẫu số của \eqref{eq:newton} tiến về 0 và độ lớn gia tốc có thể tăng đột biến. Trong mô phỏng số, điều này khiến bước thời gian hữu hạn khó theo kịp tương tác ngắn, đồng thời làm kết quả nhạy với sai số làm tròn. Chương trình dùng tham số softening $\varepsilon>0$ để thay thế khoảng cách trong mẫu số~\cite{aarseth1974}:
+\begin{equation}
+\mathbf{a}_i = G\sum_j m_j \frac{\mathbf{r}_j-\mathbf{r}_i}{\left(\lVert\mathbf{r}_j-\mathbf{r}_i\rVert^2+\varepsilon^2\right)^{3/2}}.
+\label{eq:soft}
+\end{equation}
+Softening làm lực hữu hạn khi khoảng cách tiến về 0. Vì khi $j=i$, vectơ $\mathbf{r}_j-\mathbf{r}_i$ bằng 0, thành phần tự tương tác đóng góp 0; do đó vòng lặp có thể xét cả $j=i$ mà không cần nhánh loại trừ. Điều này quan trọng cho song song hóa: vòng lặp không rẽ nhánh dễ vector hóa trên CPU và không gây phân kỳ luồng trên GPU.
+
+Softening cũng thay đổi mô hình lực ở cự ly ngắn; nó không chỉ là một thủ thuật tính toán. Năng lượng thế được tính nhất quán với mô hình đã làm mềm:
+\begin{equation}
+K = \frac{1}{2}\sum_i m_i\lVert\mathbf{v}_i\rVert^2,\qquad
+U_\varepsilon = -G\sum_{i<j} \frac{m_i m_j}{\sqrt{\lVert\mathbf{r}_i-\mathbf{r}_j\rVert^2+\varepsilon^2}},
+\qquad E=K+U_\varepsilon.
+\end{equation}
+Thí nghiệm dùng độ lệch năng lượng tương đối giữa đầu và cuối mô phỏng:
+\begin{equation}
+\left|\frac{\Delta E}{E_0}\right| =\left|\frac{E_{\mathrm{cuối}}-E_0}{E_0}\right|.
+\end{equation}
+Đây là chỉ số kiểm tra mức bảo toàn năng lượng của tích phân số trong một lần chạy; nó không phải sai số vị trí của từng vật thể.
+
+\subsection{Tích phân Euler đối xứng}
+
+Gia tốc được tính từ vị trí tại đầu bước $n$, sau đó cập nhật vận tốc rồi mới cập nhật vị trí:
+\begin{equation}
+\mathbf{v}_{n+1}=\mathbf{v}_n+\mathbf{a}(\mathbf{r}_n)\Delta t,\qquad
+\mathbf{r}_{n+1}=\mathbf{r}_n+\mathbf{v}_{n+1}\Delta t.
+\end{equation}
+Thứ tự cập nhật này được gọi là Euler đối xứng (\emph{symplectic Euler})~\cite{hairer2006}. Nó có bậc chính xác một theo bước thời gian, nhưng thường phù hợp hơn Euler tiến thông thường cho hệ cơ học bảo toàn vì giữ cấu trúc symplectic. Với $\Delta t$ hữu hạn, năng lượng tính được vẫn có thể dao động hoặc lệch khỏi giá trị ban đầu; phương pháp không bảo đảm $E_{\mathrm{cuối}}=E_0$ chính xác.
+
+Trong chương trình, các thành phần vị trí, vận tốc và gia tốc được lưu bằng \code{float}. Năng lượng động học và thế năng được cộng dồn bằng \code{double} để hạn chế sai số tổng hợp.
+
+\subsection{Khởi tạo cụm sao Plummer}
+
+Để có trạng thái đầu vào tất định và có tính chất của một cụm sao, chương trình dùng mô hình Plummer~\cite{plummer1911}. Mật độ khối lượng theo bán kính có dạng:
+\begin{equation}
+\rho(r)=\frac{3M}{4\pi a^3} \left(1+\frac{r^2}{a^2}\right)^{-5/2},
+\end{equation}
+trong đó $M$ là tổng khối lượng và $a$ là thang chiều dài. Nếu $u$ là số ngẫu nhiên phân bố đều trong $(0,1)$, phép biến đổi nghịch đảo phân bố khối lượng tích lũy cho bán kính:
+\begin{equation}
+r=\frac{a}{\sqrt{u^{-2/3}-1}}.
+\end{equation}
+Chương trình lấy hướng vị trí và hướng vận tốc phân bố trên mặt cầu, lấy độ lớn vận tốc bằng phép lấy mẫu loại bỏ, rồi dịch chuyển trạng thái để khối tâm ở gốc tọa độ và vận tốc khối tâm bằng 0. Khối lượng được chia đều, $m_i=1/N$. Các phép lấy mẫu dùng bộ sinh SplitMix64 với seed mặc định 42, nhờ đó mọi phiên bản và mọi thí nghiệm bắt đầu từ cùng một trạng thái. Mô phỏng dùng đơn vị N-body $G=M=1$, với hệ số tỉ lệ vị trí $3\pi/16$ và hệ số vận tốc tương ứng trong mã nguồn.
+
+\subsection{Thuật toán tuần tự và độ phức tạp}
+\label{sec:tuan-tu}
+
+Với mỗi vật thể $i$, thuật toán duyệt toàn bộ $N$ vật thể để cộng gia tốc. Sau khi hoàn tất gia tốc cho tất cả vật thể, một vòng lặp khác cập nhật vận tốc và vị trí. Tách hai pha bảo đảm mọi gia tốc trong bước hiện tại đều được tính từ cùng trạng thái vị trí trước khi tích phân (Hình~\ref{fig:tuan-tu}).
+
+\begin{figure}[H]
+\begin{MaGia}
+Khởi tạo pos[i], vel[i], mass[i] theo Plummer
+Lặp step = 1 .. steps:
+    Với i = 0 .. N-1:                       // pha 1: tính gia tốc, O(N^2)
+        ax, ay, az = 0
+        Với j = 0 .. N-1:
+            dx, dy, dz = pos[j] - pos[i]
+            d2 = dx*dx + dy*dy + dz*dz + eps*eps
+            scale = G * mass[j] / (sqrt(d2) * d2)
+            ax += dx * scale;  ay += dy * scale;  az += dz * scale
+        acc[i] = (ax, ay, az)
+    Với i = 0 .. N-1:                       // pha 2: tích phân, O(N)
+        vel[i] += acc[i] * dt
+        pos[i] += vel[i] * dt
+\end{MaGia}
+\caption{Mã giả thuật toán N-body tuần tự.}
+\label{fig:tuan-tu}
+\end{figure}
+
+Mã thực thi gom phép tính trên thành phần vào hàm \code{nb\_body\_acc} và hàm cập nhật vào \code{nb\_body\_update} trong \code{src/nbody\_cpu\_kernels.h}. Phiên bản tuần tự gọi \code{nb\_acc\_serial}; vòng tương tác bên trong có thể được trình biên dịch vector hóa SIMD, nhưng không phân chia các vật thể $i$ cho nhiều luồng.
+
+Độ phức tạp của thuật toán:
+\begin{itemize}
+\item Tính gia tốc: $N$ vật thể, mỗi vật thể xét $N$ nguồn lực, nên cần $O(N^2)$ phép tính mỗi bước.
+\item Cập nhật vận tốc và vị trí: $O(N)$ mỗi bước.
+\item Bộ nhớ: các mảng vị trí, vận tốc và gia tốc có tổng kích thước $O(N)$.
+\item Tính năng lượng chẩn đoán: thế năng duyệt các cặp $i<j$, nên vẫn là $O(N^2)$; chỉ tính ở đầu và cuối mô phỏng.
+\end{itemize}
+Theo quy ước của GPU Gems 3, một tương tác được tính xấp xỉ 20 phép toán dấu phẩy động. Do đó, phần tính lực chiếm gần như toàn bộ thời gian khi $N$ lớn, và đó chính là phần cần song song hóa.
+
+\section{Bố cục báo cáo}
+
+Ngoài phần Mở đầu này, báo cáo gồm các phần sau:
+\begin{itemize}
+\item \textbf{Chương~\ref{chap:ly-thuyet} -- Cơ sở lý thuyết của tính toán song song trong bài toán:} phân loại kiến trúc song song, các độ đo hiệu năng (speedup, hiệu suất, định luật Amdahl và Gustafson, mô hình roofline), phân tích khả năng song song của N-body, mô hình lập trình OpenMP và CUDA, chiến lược song song hóa của đề tài.
+\item \textbf{Chương~\ref{chap:thuc-nghiem} -- Cài đặt và thực nghiệm:} môi trường đo, kiểm chứng tính đúng đắn, cài đặt và kết quả của phiên bản OpenMP, hai kernel CUDA, so sánh tổng hợp CPU--GPU.
+\item \textbf{Kết luận:} kết quả đạt được, bài học rút ra và hướng phát triển.
+\end{itemize}
+
+Báo cáo được tổ chức theo nội dung chứ không theo từng người, nên phần việc của mỗi thành viên nằm ở nhiều chương. Bảng~\ref{tab:phan-cong} cho biết mỗi thành viên phụ trách những mục nào.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{p{3.6cm}p{11cm}}
+\toprule
+\textbf{Thành viên} & \textbf{Mục phụ trách trong báo cáo} \\
+\midrule
+Nguyễn Quốc Doanh & Mục 1.1--1.4 (tính cấp thiết, ứng dụng, mục tiêu, phạm vi); Mục~\ref{sec:moi-truong} (môi trường đo); Mục~\ref{sec:tong-hop} (so sánh tổng hợp); Kết luận; ghép và định dạng báo cáo \\
+Vũ Văn Dương & Mục~\ref{sec:co-so-bai-toan} (cơ sở lý thuyết bài toán N-body, thuật toán tuần tự); Mục 2.1--2.3 (kiến trúc song song, độ đo hiệu năng, phân tích khả năng song song); Mục~\ref{sec:dung-dan} (kiểm chứng tính đúng đắn, năng lượng) \\
+Nguyễn Tùng Dương & Mục~\ref{sec:openmp} (mô hình lập trình OpenMP); Mục~\ref{sec:chien-luoc} (chiến lược song song hóa); Mục~\ref{sec:cai-dat-openmp} (cài đặt và thực nghiệm OpenMP) \\
+Trần Tiến Đạt & Mục~\ref{sec:roofline} (roofline); Mục~\ref{sec:cuda} (mô hình lập trình CUDA, kiến trúc GPU); Mục~\ref{sec:cai-dat-cuda} (cài đặt và thực nghiệm CUDA) \\
+\bottomrule
+\end{tabular}
+\caption{Phân công nội dung báo cáo theo thành viên.}
+\label{tab:phan-cong}
+\end{table}
