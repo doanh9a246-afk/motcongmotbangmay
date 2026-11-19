@@ -2,14 +2,18 @@
 
 Mỗi người đọc **file của mình** và **phần "Ai cũng phải trả lời được"** ở cuối trang này.
 
-| Người | File | Slide trình bày | Mục trong báo cáo |
-|---|---|---|---|
-| Nguyễn Quốc Doanh | [1_doanh.md](1_doanh.md) | 2–5 (mở đầu), 25–29 (so sánh, kết luận) | 1.1–1.4, 3.1, 3.5, Kết luận |
-| Vũ Văn Dương | [2_vv_duong.md](2_vv_duong.md) | 6–12 | 1.5, 2.1–2.3, 3.2 |
-| Nguyễn Tùng Dương | [3_nt_duong.md](3_nt_duong.md) | 13–18 | 2.4, 2.6, 3.3 |
-| Trần Tiến Đạt | [4_dat.md](4_dat.md) | 19–24 | 2.2.4 (roofline), 2.5, 3.4 |
+**Cả nhóm trình bày tổng cộng 10 phút**, gồm 13 slide.
 
-Số slide tính theo [slide_nhom.pdf](../slide_nhom.pdf). Tên người nói in ở góc dưới bên trái mỗi slide. Mỗi người **≤ 5 phút**.
+| Người | File | Slide trình bày | Thời gian | Mục trong báo cáo |
+|---|---|---|---|---|
+| Nguyễn Quốc Doanh | [1_doanh.md](1_doanh.md) | 1–2 (mở đầu), 11–13 (so sánh, kết luận) | 1 phút + 1.5 phút | 1.1–1.4, 3.1, 3.5, Kết luận |
+| Vũ Văn Dương | [2_vv_duong.md](2_vv_duong.md) | 3–5 | 2.5 phút | 1.5, 2.1–2.3, 3.2 |
+| Nguyễn Tùng Dương | [3_nt_duong.md](3_nt_duong.md) | 6–8 | 2.5 phút | 2.4, 2.6, 3.3 |
+| Trần Tiến Đạt | [4_dat.md](4_dat.md) | 9–10 | 2.5 phút | 2.2.4 (roofline), 2.5, 3.4 |
+
+Số slide tính theo [slide_nhom.pdf](../slide_nhom.pdf). Tên người nói in ở góc dưới bên trái mỗi slide. **Không vượt thời gian của mình.** Slide chỉ giữ ý chính, chi tiết để dành trả lời khi thầy/cô hỏi.
+
+Báo cáo chỉ dùng **2 tài liệu tham khảo**: [1] GPU Gems 3, chương 31 (thuật toán N-body, softening, 20 FLOP, kernel tiled) và [2] OpenMP Specification (fork–join, `parallel for`, `schedule`, `reduction`, `simd`). Mỗi người nên đọc lướt phần liên quan đến mình trong 2 tài liệu này. Nếu thầy/cô hỏi "em lấy ý này ở đâu", trả lời bằng một trong hai tài liệu.
 
 Cách dùng mỗi file:
 1. **Kịch bản nói:** từng slide nói gì và mất bao lâu. Tập nói theo đúng thời gian, đừng đọc chữ trên slide.

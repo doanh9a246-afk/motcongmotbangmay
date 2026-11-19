@@ -1,6 +1,6 @@
 # Nguyễn Tùng Dương: Song song hóa bằng OpenMP
 
-**Slide:** 13–18 (~5 phút)
+**Slide:** 6–8 (~2.5 phút)
 **Báo cáo:** Mục 2.4 (mô hình OpenMP), 2.6 (chiến lược song song hóa), 3.3 (cài đặt và thực nghiệm OpenMP)
 **Code:** `nb_acc_omp`, `nb_acc_omp_custom`, `nb_acc_omp_newton3` ([nbody_cpu_kernels.h](../../src/nbody_cpu_kernels.h)), [nbody_cpu.c](../../src/nbody_cpu.c)
 
@@ -8,11 +8,9 @@
 
 | Slide | Nói gì | Thời gian |
 |---|---|---|
-| 14 Chiến lược | Đi lướt bảng: trên CPU chia vòng ngoài i và vector hóa vòng trong j; trên GPU mỗi luồng một vật thể. Cả hai đều chỉ ghi `acc[i]` của mình nên không có xung đột. Phần GPU bạn Đạt sẽ trình bày. | 30 s |
-| 15 Mô hình OpenMP | Fork–join: luồng chủ tách ra nhóm luồng, cuối vùng có barrier ngầm. `parallel for` chia vòng lặp. static chia đều trước; dynamic/guided lấy việc từ hàng đợi. `reduction` cho mỗi luồng một bản riêng. `simd` vector hóa vòng trong. | 50 s |
-| 16 Speedup | Máy i7-13620H (6P + 4E, 16 luồng). Từ 1 đến 4 luồng gần tuyến tính (E 86–100%). Tối đa 5.9× ở 16 luồng, N = 8192, 201 GFLOP/s. Không đạt 16× vì lõi E chậm, 2 luồng chia nhau một lõi P, và xung nhịp giảm khi nhiều lõi chạy. **Giới hạn đến từ phần cứng, không phải phần tuần tự.** | 70 s |
-| 17 SIMD và lập lịch | SIMD cho ×1.9–2.5 (AVX2, 8 float/lệnh). Bản tắt SIMD được đánh dấu `no-tree-vectorize` để chắc chắn là vô hướng. dynamic nhanh hơn static 13–33%: luồng trên lõi P xong sớm thì lấy thêm việc, không phải ngồi chờ lõi E. | 60 s |
-| 18 Newton 3 | Chỉ tính N²/2 cặp, nhưng chậm hơn 1.2–2.3×. Lý do: ghi phân tán vào `my_acc[j]` làm mất vector hóa, mảng đệm 4 MB tràn bộ đệm, vòng tam giác mất cân bằng tải, thêm bước cộng dồn. → *"Mời bạn Trần Tiến Đạt trình bày phần CUDA."* | 50 s |
+| 6 Cách song song hóa | Chỉ vào đoạn code: `parallel for` chia vòng i cho các luồng (fork–join, barrier ngầm cuối vùng, theo OpenMP spec); `simd reduction` vector hóa vòng j, 8 float/lệnh. Mỗi luồng chỉ ghi `acc[i]` của mình nên không cần `critical`/`atomic`. | 45 s |
+| 7 Speedup | Máy i7-13620H (6P + 4E). 1–4 luồng gần tuyến tính; tối đa 5.9× ở 16 luồng, N = 8192. Không đạt 16× vì lõi E chậm, 2 luồng chung 1 lõi P, xung nhịp giảm: **giới hạn do phần cứng.** | 50 s |
+| 8 SIMD, lập lịch, Newton 3 | SIMD ×2.2. `dynamic` nhanh hơn `static` 13–33% nhờ cân bằng tải giữa lõi P và E. Newton 3 tính một nửa mà lại chậm hơn 1.2–2.3× (ghi phân tán, mất SIMD, mảng đệm 4 MB). → *"Mời bạn Trần Tiến Đạt."* | 55 s |
 
 ## Số liệu phải thuộc
 

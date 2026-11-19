@@ -1,25 +1,23 @@
 # Nguyễn Quốc Doanh: Mở đầu, So sánh tổng hợp, Kết luận
 
-**Slide:** 2–5 (mở bài, ~2 phút) và 25–29 (kết bài, ~3 phút)
+**Slide:** 1–2 (mở bài, ~1 phút) và 11–13 (kết bài, ~1.5 phút)
 **Báo cáo:** Mục 1.1–1.4, 3.1 (môi trường đo), 3.5 (so sánh tổng hợp), Kết luận
 **Code/script:** `src/nbody_common.h`, `Makefile`, `scripts/benchmark.sh`, `scripts/plot_results.py`
 
 ## Kịch bản nói
 
-### Mở bài (~2 phút)
+### Mở bài (~1 phút)
 | Slide | Nói gì | Thời gian |
 |---|---|---|
-| 2 Nội dung | Giới thiệu nhóm. Bài trình bày có 5 phần, mỗi người trình bày phần mình làm. | 20 s |
-| 3–4 Tính cấp thiết | N vật thể thì có N² tương tác. Với N = 10⁵, một bước cần 2·10¹¹ FLOP. Một lõi CPU (~34 GFLOP/s) chạy 10⁴ bước mất ~16 giờ. Xung nhịp không tăng nữa, muốn nhanh hơn phải song song. N-body là bài toán mẫu vì các tương tác độc lập với nhau. | 60 s |
-| 5 Mục tiêu | Bốn phiên bản cùng đầu vào (Plummer, seed 42): tuần tự làm mốc, OpenMP, CUDA naive, CUDA tiled. Kiểm tra đúng, rồi đo hiệu năng. → *"Mời bạn Vũ Văn Dương trình bày cơ sở lý thuyết."* | 40 s |
+| 1 Bìa | Giới thiệu đề tài và 4 thành viên. | 10 s |
+| 2 Đặt vấn đề và mục tiêu | N vật thể thì có N² tương tác. Với N = 10⁵, một lõi CPU chạy 10⁴ bước mất ~16 giờ, nên phải song song. Các tương tác trong một bước độc lập, nên N-body là bài toán mẫu. Nhóm làm 4 phiên bản cùng đầu vào: tuần tự, OpenMP, CUDA naive, CUDA tiled. → *"Mời bạn Vũ Văn Dương."* | 50 s |
 
-### Kết bài (~3 phút)
+### Kết bài (~1.5 phút)
 | Slide | Nói gì | Thời gian |
 |---|---|---|
-| 26 So sánh tổng hợp | Trên đồ thị log–log, mỗi đường có độ dốc ≈ 2, xác nhận O(N²). Song song hóa chỉ **dịch đường xuống**, không đổi bậc. Ở N = 131072: OpenMP 4.8×, CUDA tiled 132× so với tuần tự (28× so với OpenMP). Với N nhỏ, GPU không đủ việc cho 40 SM. CPU và GPU đo trên hai máy, nên chỉ so được bậc độ lớn. | 75 s |
-| 27 Kết luận | Bốn phiên bản cho kết quả khớp nhau. OpenMP 4.8–5.9×, SIMD ×2.2, dynamic tốt hơn trên CPU lai. CUDA tiled đạt 4.7 TFLOP/s. Kết quả khớp lý thuyết (Gustafson, roofline). **Bài học: cách truy cập bộ nhớ quan trọng không kém số phép tính.** | 60 s |
-| 28 Hướng phát triển | Barnes–Hut O(N log N), nhiều GPU + MPI, tối ưu kernel, tích phân bậc cao. | 30 s |
-| 29 | Cảm ơn, mời thầy/cô đặt câu hỏi. | 5 s |
+| 11 So sánh tổng hợp | Đồ thị log–log có độ dốc ≈ 2, xác nhận O(N²); song song hóa chỉ **dịch đường xuống**. Ở N = 131072: OpenMP 4.8×, CUDA tiled 132× (28× so với OpenMP). CPU và GPU đo trên hai máy nên chỉ so bậc độ lớn. | 45 s |
+| 12 Kết luận và hướng phát triển | Bốn phiên bản khớp nhau; OpenMP 4.8–5.9×; CUDA 132×, 4.7 TFLOP/s. **Bài học: cách truy cập bộ nhớ quan trọng không kém số phép tính.** Hướng phát triển: Barnes–Hut, nhiều GPU + MPI. | 40 s |
+| 13 | Cảm ơn, mời thầy/cô đặt câu hỏi. | 5 s |
 
 ## Số liệu phải thuộc
 

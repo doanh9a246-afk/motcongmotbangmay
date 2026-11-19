@@ -7,7 +7,7 @@ Chương này trình bày các khái niệm của tính toán song song được
 
 \subsection{Phân loại Flynn}
 
-Flynn~\cite{flynn1972} phân loại máy tính theo số dòng lệnh (instruction stream) và số dòng dữ liệu (data stream) được xử lý đồng thời (Bảng~\ref{tab:flynn}).
+Phân loại của Flynn chia máy tính theo số dòng lệnh (instruction stream) và số dòng dữ liệu (data stream) được xử lý đồng thời (Bảng~\ref{tab:flynn}).
 
 \begin{table}[H]
 \centering\small
@@ -60,7 +60,7 @@ với $t$ là thời gian tính (giây) và 20 là số phép toán dấu phẩy
 
 \subsection{Định luật Amdahl}
 
-Giả sử tỷ lệ $P$ thời gian chạy tuần tự có thể song song hóa hoàn toàn, phần còn lại $1-P$ bắt buộc chạy tuần tự. Khi đó speedup tối đa với $p$ luồng là~\cite{amdahl1967}:
+Giả sử tỷ lệ $P$ thời gian chạy tuần tự có thể song song hóa hoàn toàn, phần còn lại $1-P$ bắt buộc chạy tuần tự. Khi đó speedup tối đa với $p$ luồng là (định luật Amdahl):
 \begin{equation}
 S(p)=\frac{1}{(1-P)+P/p} \;\xrightarrow{\;p\to\infty\;}\; \frac{1}{1-P}.
 \label{eq:amdahl}
@@ -69,7 +69,7 @@ Ví dụ, với $P=0.99$ và $p=16$ thì $S \approx 13.9$; dù có vô hạn lu�
 
 \subsection{Định luật Gustafson}
 
-Amdahl giả định kích thước bài toán cố định. Trong thực tế, khi có nhiều tài nguyên hơn, người ta thường giải bài toán lớn hơn. Gustafson~\cite{gustafson1988} xét trường hợp thời gian chạy song song cố định và kích thước bài toán tăng theo $p$; gọi $s$ là tỷ lệ thời gian tuần tự đo trên máy song song, speedup theo kích thước mở rộng là:
+Amdahl giả định kích thước bài toán cố định. Trong thực tế, khi có nhiều tài nguyên hơn, người ta thường giải bài toán lớn hơn. Định luật Gustafson xét trường hợp thời gian chạy song song cố định và kích thước bài toán tăng theo $p$; gọi $s$ là tỷ lệ thời gian tuần tự đo trên máy song song, speedup theo kích thước mở rộng là:
 \begin{equation}
 S_{\text{scaled}}(p) = s + (1-s)\,p.
 \end{equation}
@@ -82,7 +82,7 @@ Với N-body, khi $N$ tăng thì phần tính lực $O(N^2)$ tăng nhanh hơn nh
 \begin{equation}
 AI = \frac{\text{FLOP}}{\text{byte}}.
 \end{equation}
-Mô hình roofline~\cite{williams2009} cho biết hiệu năng đạt được bị giới hạn bởi hiệu năng đỉnh $P_{\text{peak}}$ hoặc bởi băng thông bộ nhớ $BW$:
+Mô hình roofline cho biết hiệu năng đạt được bị giới hạn bởi hiệu năng đỉnh $P_{\text{peak}}$ hoặc bởi băng thông bộ nhớ $BW$:
 \begin{equation}
 P_{\text{đạt}} \le \min\left(P_{\text{peak}},\; AI \times BW\right).
 \label{eq:roofline}
@@ -110,7 +110,7 @@ Mỗi tương tác cần khoảng 20 FLOP và đọc một bản ghi vị trí--
 \begin{equation}
 AI_{\text{naive}} = \frac{20}{16} = 1.25 \text{ FLOP/byte},
 \end{equation}
-thấp hơn nhiều so với điểm cân bằng $25.3$ FLOP/byte của T4. Theo \eqref{eq:roofline}, chương trình như vậy có nguy cơ bị giới hạn bởi bộ nhớ. Tuy nhiên, toàn bộ dữ liệu chỉ có $16N$ byte, trong khi số tương tác là $N^2$: mỗi vị trí được dùng lại $N$ lần. Nếu một nhóm $B$ luồng nạp chung một khối $B$ vị trí vào bộ nhớ nhanh rồi cùng dùng lại, số byte đọc từ bộ nhớ chính giảm $B$ lần và cường độ tính toán tăng tương ứng ($B=256$ cho $AI \approx 320$ FLOP/byte). Đây là cơ sở lý thuyết của kỹ thuật \emph{tiling} trên GPU và của việc tận dụng bộ nhớ đệm trên CPU.
+thấp hơn nhiều so với điểm cân bằng $25.3$ FLOP/byte của T4. Theo \eqref{eq:roofline}, chương trình như vậy có nguy cơ bị giới hạn bởi bộ nhớ. Tuy nhiên, toàn bộ dữ liệu chỉ có $16N$ byte, trong khi số tương tác là $N^2$: mỗi vị trí được dùng lại $N$ lần. Nếu một nhóm $B$ luồng nạp chung một khối $B$ vị trí vào bộ nhớ nhanh rồi cùng dùng lại, số byte đọc từ bộ nhớ chính giảm $B$ lần và cường độ tính toán tăng tương ứng ($B=256$ cho $AI \approx 320$ FLOP/byte). Đây là cơ sở lý thuyết của kỹ thuật \emph{tiling} trên GPU~\cite{gpugems3} và của việc tận dụng bộ nhớ đệm trên CPU.
 
 Áp dụng định luật Amdahl: phần tính lực chiếm $O(N^2)$, các phần còn lại $O(N)$, nên $P \to 1$ khi $N$ tăng. Với $N$ nhỏ, chi phí cố định (tạo luồng, khởi chạy kernel, sao chép dữ liệu) chiếm tỷ lệ lớn và làm giảm speedup.
 
@@ -121,7 +121,7 @@ OpenMP~\cite{openmp52} là chuẩn lập trình song song cho hệ bộ nhớ ch
 
 \subsection{Mô hình fork--join}
 
-Mô hình thực thi của OpenMP là \textbf{fork--join} (Hình~\ref{fig:fork-join}):
+Mô hình thực thi của OpenMP là \textbf{fork--join}~\cite{openmp52} (Hình~\ref{fig:fork-join}):
 \begin{enumerate}
 \item Chương trình bắt đầu bằng một luồng duy nhất, gọi là \textbf{luồng chủ} (master thread), chạy tuần tự.
 \item Khi gặp chỉ thị \code{\#pragma omp parallel}, luồng chủ thực hiện \textbf{fork}: một nhóm luồng (thread team) được kích hoạt, thường lấy lại từ thread pool.
@@ -152,28 +152,28 @@ Mô hình thực thi của OpenMP là \textbf{fork--join} (Hình~\ref{fig:fork-j
 
 \subsection{Chia vòng lặp và lập lịch}
 
-Chỉ thị \code{\#pragma omp parallel for} chia các lần lặp của vòng \code{for} ngay sau nó cho các luồng. Mệnh đề \code{schedule} quyết định cách chia:
+Chỉ thị \code{\#pragma omp parallel for} chia các lần lặp của vòng \code{for} ngay sau nó cho các luồng. Mệnh đề \code{schedule} quyết định cách chia~\cite{openmp52}:
 \begin{itemize}
 \item \code{schedule(static)}: chia trước thành các khối liên tiếp bằng nhau, mỗi luồng một khối. Chi phí lập lịch gần bằng 0, tối ưu khi mọi lần lặp tốn thời gian như nhau và mọi lõi có tốc độ như nhau.
 \item \code{schedule(dynamic, c)}: các khối $c$ lần lặp nằm trong hàng đợi chung; luồng nào xong trước thì lấy khối tiếp theo. Có chi phí lập lịch nhưng cân bằng tải tốt khi khối lượng hoặc tốc độ lõi không đều.
 \item \code{schedule(guided, c)}: giống \code{dynamic} nhưng kích thước khối giảm dần, bắt đầu từ khối lớn để giảm chi phí lập lịch.
 \end{itemize}
-Biến trong vùng song song có thể là \code{shared} (dùng chung) hoặc \code{private} (mỗi luồng một bản). Mệnh đề \code{reduction(+:x)} tạo bản riêng của \code{x} cho mỗi luồng và cộng dồn ở cuối, tránh xung đột khi cộng vào một biến chung.
+Biến trong vùng song song có thể là \code{shared} (dùng chung) hoặc \code{private} (mỗi luồng một bản). Mệnh đề \code{reduction(+:x)} tạo bản riêng của \code{x} cho mỗi luồng và cộng dồn ở cuối, tránh xung đột khi cộng vào một biến chung~\cite{openmp52}.
 
 \subsection{Vector hóa với \texttt{omp simd}}
 
-Chỉ thị \code{\#pragma omp simd} yêu cầu trình biên dịch vector hóa vòng lặp, tức là sinh lệnh SIMD xử lý nhiều lần lặp trong một lệnh. Kết hợp \code{parallel for} ở vòng ngoài và \code{simd} ở vòng trong cho phép khai thác cả hai mức song song của CPU: MIMD giữa các lõi và SIMD trong mỗi lõi.
+Chỉ thị \code{\#pragma omp simd} yêu cầu trình biên dịch vector hóa vòng lặp, tức là sinh lệnh SIMD xử lý nhiều lần lặp trong một lệnh~\cite{openmp52}. Kết hợp \code{parallel for} ở vòng ngoài và \code{simd} ở vòng trong cho phép khai thác cả hai mức song song của CPU: MIMD giữa các lõi và SIMD trong mỗi lõi.
 
 \section{Mô hình lập trình CUDA và kiến trúc GPU}
 \label{sec:cuda}
 
 \subsection{Mô hình lập trình}
 
-CUDA~\cite{cudaguide} là nền tảng lập trình GPU của NVIDIA. Chương trình gồm phần chạy trên CPU (\emph{host}) và các hàm \emph{kernel} chạy trên GPU (\emph{device}). Khi gọi kernel, host chỉ định một \textbf{lưới} (grid) gồm nhiều \textbf{khối} (block), mỗi khối gồm nhiều \textbf{luồng} (thread). Mỗi luồng biết vị trí của mình qua các biến \code{blockIdx}, \code{blockDim}, \code{threadIdx} và thường xử lý một phần tử dữ liệu.
+CUDA là nền tảng lập trình GPU của NVIDIA. Chương trình gồm phần chạy trên CPU (\emph{host}) và các hàm \emph{kernel} chạy trên GPU (\emph{device}). Khi gọi kernel, host chỉ định một \textbf{lưới} (grid) gồm nhiều \textbf{khối} (block), mỗi khối gồm nhiều \textbf{luồng} (thread). Mỗi luồng biết vị trí của mình qua các biến \code{blockIdx}, \code{blockDim}, \code{threadIdx} và thường xử lý một phần tử dữ liệu.
 
 Phần cứng thực thi luồng theo mô hình \textbf{SIMT} (single instruction, multiple threads): 32 luồng liên tiếp tạo thành một \emph{warp} và cùng thực hiện một lệnh tại một thời điểm. Nếu các luồng trong warp rẽ nhánh khác nhau, các nhánh phải chạy lần lượt (phân kỳ warp), làm giảm hiệu năng. Các khối được phân cho các \emph{Streaming Multiprocessor} (SM); một SM chạy xen kẽ nhiều warp để che độ trễ truy cập bộ nhớ. Tỷ lệ warp đang hoạt động so với tối đa của SM gọi là \emph{occupancy}.
 
-Các luồng trong \emph{cùng một khối} có thể dùng chung \textbf{shared memory} và đồng bộ với nhau bằng \code{\_\_syncthreads()}: không luồng nào trong khối vượt qua lệnh này cho đến khi mọi luồng của khối đều đến đó. Các khối khác nhau thì độc lập, không đồng bộ được bên trong một kernel.
+Các luồng trong \emph{cùng một khối} có thể dùng chung \textbf{shared memory} và đồng bộ với nhau bằng \code{\_\_syncthreads()}: không luồng nào trong khối vượt qua lệnh này cho đến khi mọi luồng của khối đều đến đó. Các khối khác nhau thì độc lập, không đồng bộ được bên trong một kernel. GPU Gems 3~\cite{gpugems3} trình bày cách dùng các cơ chế này cho bài toán N-body: mỗi luồng một vật thể, các luồng trong khối phối hợp nạp dữ liệu vào shared memory.
 
 \subsection{Phân cấp bộ nhớ}
 
@@ -199,7 +199,7 @@ Khi các luồng liền kề trong một warp đọc các địa chỉ liền k�
 
 \subsection{GPU NVIDIA Tesla T4}
 
-Đề tài dùng GPU NVIDIA Tesla T4 (kiến trúc Turing) trên Google Colab~\cite{t4}. Các thông số quan trọng:
+Đề tài dùng GPU NVIDIA Tesla T4 (kiến trúc Turing) trên Google Colab. Các thông số quan trọng (theo công bố của NVIDIA):
 \begin{itemize}
 \item 40 SM, mỗi SM có 64 nhân CUDA FP32, tổng cộng 2560 nhân CUDA.
 \item Hiệu năng FP32 lý thuyết khoảng 8.1 TFLOP/s (8100 GFLOP/s), giới hạn công suất 70 W.
@@ -210,7 +210,7 @@ Khi các luồng liền kề trong một warp đọc các địa chỉ liền k�
 \section{Chiến lược song song hóa áp dụng trong đề tài}
 \label{sec:chien-luoc}
 
-Từ các phân tích trên, nhóm chọn chiến lược song song hóa cho từng nền tảng như trong Bảng~\ref{tab:chien-luoc}.
+Từ các phân tích trên, nhóm chọn chiến lược song song hóa cho từng nền tảng như trong Bảng~\ref{tab:chien-luoc}: phía CPU dựa trên các chỉ thị của OpenMP~\cite{openmp52}, phía GPU theo thuật toán của GPU Gems 3~\cite{gpugems3}.
 
 \begin{table}[H]
 \centering\small

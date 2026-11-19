@@ -37,7 +37,7 @@ Bài toán N-body rất phù hợp để nghiên cứu vấn đề này. Các t�
 \section{Phạm vi và giới hạn}
 
 \begin{itemize}
-\item Chỉ xét thuật toán trực tiếp $O(N^2)$; các thuật toán xấp xỉ như Barnes--Hut $O(N\log N)$~\cite{barnes1986} hay Fast Multipole Method chỉ được nêu ở phần hướng phát triển.
+\item Chỉ xét thuật toán trực tiếp $O(N^2)$ như trong GPU Gems 3~\cite{gpugems3}; các thuật toán xấp xỉ như Barnes--Hut $O(N\log N)$ hay Fast Multipole Method chỉ được nêu ở phần hướng phát triển.
 \item Dùng số thực độ chính xác đơn (\code{float}), giống GPU Gems 3.
 \item CPU được đo trên laptop của các thành viên (Intel thế hệ 12--13, kiến trúc lai lõi P/lõi E), GPU là NVIDIA Tesla T4 trên Google Colab. Do CPU và GPU nằm trên hai máy khác nhau, phép so sánh CPU--GPU mang tính tham khảo về bậc độ lớn, không phải so sánh trên cùng một hệ thống. Cấu hình chi tiết ở Mục~\ref{sec:moi-truong}.
 \end{itemize}
@@ -58,12 +58,12 @@ Trong công thức này, $G$ là hằng số hấp dẫn. Khi mô phỏng trực
 
 \subsection{Softening và năng lượng}
 
-Nếu hai vật thể tiến rất gần nhau, mẫu số của \eqref{eq:newton} tiến về 0 và độ lớn gia tốc có thể tăng đột biến. Trong mô phỏng số, điều này khiến bước thời gian hữu hạn khó theo kịp tương tác ngắn, đồng thời làm kết quả nhạy với sai số làm tròn. Chương trình dùng tham số softening $\varepsilon>0$ để thay thế khoảng cách trong mẫu số~\cite{aarseth1974}:
+Nếu hai vật thể tiến rất gần nhau, mẫu số của \eqref{eq:newton} tiến về 0 và độ lớn gia tốc có thể tăng đột biến. Trong mô phỏng số, điều này khiến bước thời gian hữu hạn khó theo kịp tương tác ngắn, đồng thời làm kết quả nhạy với sai số làm tròn. Chương trình dùng tham số softening $\varepsilon>0$ để thay thế khoảng cách trong mẫu số, giống cách làm của GPU Gems 3~\cite{gpugems3}:
 \begin{equation}
 \mathbf{a}_i = G\sum_j m_j \frac{\mathbf{r}_j-\mathbf{r}_i}{\left(\lVert\mathbf{r}_j-\mathbf{r}_i\rVert^2+\varepsilon^2\right)^{3/2}}.
 \label{eq:soft}
 \end{equation}
-Softening làm lực hữu hạn khi khoảng cách tiến về 0. Vì khi $j=i$, vectơ $\mathbf{r}_j-\mathbf{r}_i$ bằng 0, thành phần tự tương tác đóng góp 0; do đó vòng lặp có thể xét cả $j=i$ mà không cần nhánh loại trừ. Điều này quan trọng cho song song hóa: vòng lặp không rẽ nhánh dễ vector hóa trên CPU và không gây phân kỳ luồng trên GPU.
+Softening làm lực hữu hạn khi khoảng cách tiến về 0. Vì khi $j=i$, vectơ $\mathbf{r}_j-\mathbf{r}_i$ bằng 0, thành phần tự tương tác đóng góp 0; do đó vòng lặp có thể xét cả $j=i$ mà không cần nhánh loại trừ~\cite{gpugems3}. Điều này quan trọng cho song song hóa: vòng lặp không rẽ nhánh dễ vector hóa trên CPU và không gây phân kỳ luồng trên GPU.
 
 Softening cũng thay đổi mô hình lực ở cự ly ngắn; nó không chỉ là một thủ thuật tính toán. Năng lượng thế được tính nhất quán với mô hình đã làm mềm:
 \begin{equation}
@@ -84,13 +84,13 @@ Gia tốc được tính từ vị trí tại đầu bước $n$, sau đó cập
 \mathbf{v}_{n+1}=\mathbf{v}_n+\mathbf{a}(\mathbf{r}_n)\Delta t,\qquad
 \mathbf{r}_{n+1}=\mathbf{r}_n+\mathbf{v}_{n+1}\Delta t.
 \end{equation}
-Thứ tự cập nhật này được gọi là Euler đối xứng (\emph{symplectic Euler})~\cite{hairer2006}. Nó có bậc chính xác một theo bước thời gian, nhưng thường phù hợp hơn Euler tiến thông thường cho hệ cơ học bảo toàn vì giữ cấu trúc symplectic. Với $\Delta t$ hữu hạn, năng lượng tính được vẫn có thể dao động hoặc lệch khỏi giá trị ban đầu; phương pháp không bảo đảm $E_{\mathrm{cuối}}=E_0$ chính xác.
+Thứ tự cập nhật này được gọi là Euler đối xứng (\emph{symplectic Euler}). Nó có bậc chính xác một theo bước thời gian, nhưng thường phù hợp hơn Euler tiến thông thường cho hệ cơ học bảo toàn vì giữ cấu trúc symplectic. Với $\Delta t$ hữu hạn, năng lượng tính được vẫn có thể dao động hoặc lệch khỏi giá trị ban đầu; phương pháp không bảo đảm $E_{\mathrm{cuối}}=E_0$ chính xác.
 
 Trong chương trình, các thành phần vị trí, vận tốc và gia tốc được lưu bằng \code{float}. Năng lượng động học và thế năng được cộng dồn bằng \code{double} để hạn chế sai số tổng hợp.
 
 \subsection{Khởi tạo cụm sao Plummer}
 
-Để có trạng thái đầu vào tất định và có tính chất của một cụm sao, chương trình dùng mô hình Plummer~\cite{plummer1911}. Mật độ khối lượng theo bán kính có dạng:
+Để có trạng thái đầu vào tất định và có tính chất của một cụm sao, chương trình dùng mô hình cụm sao Plummer. Mật độ khối lượng theo bán kính có dạng:
 \begin{equation}
 \rho(r)=\frac{3M}{4\pi a^3} \left(1+\frac{r^2}{a^2}\right)^{-5/2},
 \end{equation}
@@ -134,7 +134,7 @@ Mã thực thi gom phép tính trên thành phần vào hàm \code{nb\_body\_acc
 \item Bộ nhớ: các mảng vị trí, vận tốc và gia tốc có tổng kích thước $O(N)$.
 \item Tính năng lượng chẩn đoán: thế năng duyệt các cặp $i<j$, nên vẫn là $O(N^2)$; chỉ tính ở đầu và cuối mô phỏng.
 \end{itemize}
-Theo quy ước của GPU Gems 3, một tương tác được tính xấp xỉ 20 phép toán dấu phẩy động. Do đó, phần tính lực chiếm gần như toàn bộ thời gian khi $N$ lớn, và đó chính là phần cần song song hóa.
+Theo quy ước của GPU Gems 3~\cite{gpugems3}, một tương tác được tính xấp xỉ 20 phép toán dấu phẩy động. Do đó, phần tính lực chiếm gần như toàn bộ thời gian khi $N$ lớn, và đó chính là phần cần song song hóa.
 
 \section{Bố cục báo cáo}
 
