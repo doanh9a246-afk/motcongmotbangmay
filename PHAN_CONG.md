@@ -3,6 +3,8 @@
 **Đề tài:** Song song hóa mô phỏng N-body (lực hấp dẫn) bằng OpenMP và CUDA
 **Nhóm trưởng:** Nguyễn Quốc Doanh
 
+> **Cập nhật 19/11:** báo cáo đã chuyển sang LaTeX (`bao_cao/latex/`) và tổ chức theo nội dung (Mở đầu → Lý thuyết song song → Cài đặt & thực nghiệm → Kết luận), không còn Ch.1–Ch.5 theo từng người. Phần của mỗi người trong báo cáo/slide và tài liệu ôn thuyết trình: xem [bao_cao/on_tap/](bao_cao/on_tap/README.md) và Bảng 1.1 trong báo cáo.
+
 Nguyên tắc chia việc: mỗi người phụ trách **1 phần code + 1 nhóm thí nghiệm + 1 chương báo cáo + phần slide tương ứng**, khối lượng tương đương nhau (~25% mỗi người). Nhóm trưởng gánh thêm việc điều phối nên phần code riêng nhẹ hơn một chút.
 
 ## Tổng quan

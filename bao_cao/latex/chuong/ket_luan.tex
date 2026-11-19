@@ -1,0 +1,30 @@
+\chapter*{Kết luận}
+\addcontentsline{toc}{chapter}{Kết luận}
+\label{chap:ket-luan}
+
+\section*{Kết quả đạt được}
+
+Đề tài đã cài đặt bài toán N-body all-pairs theo bốn phiên bản có cùng đầu vào: tuần tự, OpenMP, CUDA naive và CUDA tiled, và đánh giá chúng dựa trên cơ sở lý thuyết tính toán song song ở Chương~\ref{chap:ly-thuyet}. Các kết quả chính:
+\begin{itemize}
+\item \textbf{Tính đúng đắn:} bản OpenMP khớp bản tuần tự từng bit, hai kernel CUDA khớp với sai số làm tròn khoảng $10^{-8}$; năng lượng toàn phần được bảo toàn tốt ($|\Delta E/E_0| \approx 2.7\times10^{-6}$ sau 2000 bước với $\Delta t=0.002$, $\varepsilon=0.01$).
+\item \textbf{CPU đa lõi:} OpenMP tăng tốc 4.8--5.9 lần với 16 luồng trên CPU lai, đạt khoảng 200 GFLOP/s. Vector hóa SIMD đóng góp khoảng 2.2 lần; \code{schedule(dynamic)} nhanh hơn \code{static} 13--33\% nhờ cân bằng tải giữa lõi P và lõi E.
+\item \textbf{GPU:} trên Tesla T4, kernel tiled nhanh hơn bản tuần tự khoảng 132 lần và nhanh hơn OpenMP 16 luồng khoảng 28 lần ở $N=131072$, đạt cao nhất 4.7 TFLOP/s (khoảng 58\% đỉnh lý thuyết). Tiling bằng shared memory nhanh hơn kernel naive 1.16--1.70 lần.
+\end{itemize}
+
+\section*{Bài học rút ra}
+
+\begin{itemize}
+\item Bài toán có cường độ tính toán cao và các phép tính độc lập như N-body rất phù hợp với GPU; speedup tăng theo kích thước bài toán đúng như định luật Gustafson dự đoán.
+\item Speedup thực tế bị giới hạn chủ yếu bởi phần cứng (lõi không đồng nhất, xung nhịp, băng thông bộ nhớ) chứ không phải phần tuần tự của chương trình; định luật Amdahl chỉ là giới hạn trên lý tưởng.
+\item Cách truy cập bộ nhớ quan trọng không kém số phép tính: biến thể định luật 3 Newton giảm một nửa phép tính nhưng chậm hơn 1.2--2.3 lần vì mất vector hóa và phải đồng bộ; kernel tiled nhanh hơn naive dù số phép tính như nhau.
+\end{itemize}
+
+\section*{Hướng phát triển}
+
+\begin{itemize}
+\item \textbf{Thuật toán Barnes--Hut} (cây octree, $O(N\log N)$)~\cite{barnes1986} hoặc \textbf{Fast Multipole Method} ($O(N)$) để mô phỏng hàng triệu vật thể.
+\item \textbf{Nhiều GPU, nhiều máy} bằng MPI: chia các vật thể cho từng tiến trình, trao đổi vị trí mỗi bước theo mô hình vòng (ring).
+\item \textbf{Tối ưu kernel CUDA:} thử các mức mở vòng lặp khác (hiện dùng \code{\#pragma unroll 8}), mỗi luồng tính nhiều vật thể (thread coarsening), khai thác định luật 3 Newton theo khối để vẫn giữ được vector hóa.
+\item \textbf{Tích phân bậc cao hơn} (leapfrog, Hermite bậc 4) và bước thời gian thích nghi để giảm sai số năng lượng.
+\item \textbf{Kết hợp CPU và GPU:} chồng lấp truyền dữ liệu với tính toán bằng CUDA streams, chia việc đồng thời cho CPU và GPU.
+\end{itemize}
