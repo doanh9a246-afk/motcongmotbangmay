@@ -1,6 +1,6 @@
 # Vũ Văn Dương: Bài toán N-body, lý thuyết song song, kiểm chứng
 
-**Slide:** 6–12 (~5 phút)
+**Slide:** 3–5 (~2.5 phút)
 **Báo cáo:** Mục 1.5 (cơ sở lý thuyết N-body, thuật toán tuần tự), 2.1 (kiến trúc), 2.2 (độ đo hiệu năng), 2.3 (phân tích khả năng song song), 3.2 (kiểm chứng tính đúng đắn)
 **Code:** `nb_init_plummer`, `nb_energy` ([nbody_common.h](../../src/nbody_common.h)); `nb_body_acc`, `nb_acc_serial`, `nb_integrate` ([nbody_cpu_kernels.h](../../src/nbody_cpu_kernels.h)); `scripts/visualize.py`
 
@@ -8,12 +8,11 @@
 
 | Slide | Nói gì | Thời gian |
 |---|---|---|
-| 7 Cơ sở N-body | Công thức gia tốc có softening ε, nhờ ε lực luôn hữu hạn. Khi j = i, vectơ khoảng cách bằng 0 nên đóng góp bằng 0; vì vậy **vòng lặp không cần `if`**, dễ vector hóa. Tích phân Euler đối xứng: cập nhật v trước, rồi dùng v mới để cập nhật r. Khởi tạo cụm sao Plummer, G = M = 1. | 50 s |
-| 8 Thuật toán tuần tự | Pha 1 tính gia tốc O(N²), pha 2 cập nhật O(N). Phần O(N²) chiếm gần như toàn bộ thời gian, nên đó là phần cần song song hóa. | 30 s |
-| 9 Kiến trúc song song | Theo Flynn: CPU đa lõi là MIMD, mỗi lõi lại có SIMD (AVX2 xử lý 8 float một lệnh), nên CPU song song ở 2 mức. CPU lai có lõi P/E không đều. GPU chạy theo SIMT, mỗi warp 32 luồng. | 40 s |
-| 10 Độ đo hiệu năng | Speedup S = T₁/Tₚ, hiệu suất E = S/p. Amdahl: P = 0.99, p = 16 thì S ≈ 13.9. Gustafson: khi bài toán lớn lên, phần tuần tự co lại. Với N-body, N càng lớn thì speedup càng gần tuyến tính. | 50 s |
-| 11 Phân tích song song | Mỗi a_i chỉ đọc `pos`, chỉ ghi `acc[i]`, nên không có xung đột ghi. Phân rã theo vật thể đích cho N việc bằng nhau. Định luật 3 Newton giảm một nửa số phép tính nhưng gây xung đột ghi (bạn N.T. Dương sẽ đo). Giữa hai pha cần một barrier. | 40 s |
-| 12 Kiểm chứng | `-verify`: OpenMP khớp từng bit, CUDA sai khác ~10⁻⁸. Đồ thị năng lượng: Δt > 0.002 thì sai số tăng nhanh. Chọn Δt = 0.002, ε = 0.01, cho \|ΔE/E₀\| ≈ 2.7·10⁻⁶. → *"Mời bạn Nguyễn Tùng Dương trình bày phần OpenMP."* | 50 s |
+| 3 Bài toán và thuật toán tuần tự | Công thức gia tốc có softening ε: lực luôn hữu hạn; khi j = i đóng góp bằng 0 nên **vòng lặp không cần `if`** (theo GPU Gems 3). Euler đối xứng: cập nhật v trước rồi dùng v mới cập nhật r. Mỗi bước 2 pha: tính gia tốc O(N²), cập nhật O(N), nên cần song song hóa pha 1. | 55 s |
+| 4 Khả năng song song và độ đo | Mỗi a_i chỉ đọc `pos`, chỉ ghi `acc[i]`, nên các i độc lập, không xung đột ghi. Speedup S = T₁/Tₚ, hiệu suất E = S/p. Amdahl: bài toán cố định thì speedup bị chặn. Gustafson: N lớn lên thì phần O(N) co lại, speedup tăng. | 50 s |
+| 5 Kiểm chứng | `-verify`: OpenMP khớp từng bit, CUDA sai khác ~10⁻⁸. Đồ thị: Δt > 0.002 thì sai số năng lượng tăng nhanh. Chọn Δt = 0.002, ε = 0.01, cho \|ΔE/E₀\| ≈ 2.7·10⁻⁶. → *"Mời bạn Nguyễn Tùng Dương."* | 45 s |
+
+Các nội dung không còn trên slide (phân loại Flynn, CPU lai, roofline) vẫn có trong báo cáo. Hãy ôn để trả lời nếu bị hỏi.
 
 ## Số liệu phải thuộc
 
@@ -29,7 +28,7 @@
 ## Câu hỏi có thể gặp
 
 **H: Softening ε để làm gì? Có làm sai vật lý không?**
-Khi hai vật rất gần nhau, 1/r² tiến tới vô cùng, gia tốc tăng đột biến và bước Δt hữu hạn không theo kịp. ε làm lực luôn hữu hạn. Có làm thay đổi mô hình ở cự ly ngắn (khoảng cách cỡ ε), vì vậy thế năng cũng phải tính theo công thức đã làm mềm U_ε cho nhất quán. Trong mô phỏng cụm sao, đây là cách làm chuẩn (Aarseth 1974).
+Khi hai vật rất gần nhau, 1/r² tiến tới vô cùng, gia tốc tăng đột biến và bước Δt hữu hạn không theo kịp. ε làm lực luôn hữu hạn. Có làm thay đổi mô hình ở cự ly ngắn (khoảng cách cỡ ε), vì vậy thế năng cũng phải tính theo công thức đã làm mềm U_ε cho nhất quán. Đây là cách làm chuẩn trong mô phỏng cụm sao, và GPU Gems 3 (tài liệu [1]) cũng dùng đúng cách này.
 
 **H: Vì sao không cần điều kiện `j ≠ i`?**
 Khi j = i thì r = 0. Nhờ ε² > 0 nên mẫu số khác 0 và đóng góp là 0·(…) = 0. Bỏ được `if` giúp CPU vector hóa vòng lặp và GPU không bị phân kỳ warp.

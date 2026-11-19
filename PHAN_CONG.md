@@ -50,7 +50,7 @@ Nguyên tắc chia việc: mỗi người phụ trách **1 phần code + 1 nhóm
 | 3 | Benchmark tổng hợp, vẽ đồ thị | Viết Ch.2, làm GIF | Viết Ch.3 | Viết Ch.4 |
 | 4 | Viết Ch.1, Ch.5, ghép báo cáo + slide | Slide Ch.2 | Slide Ch.3 | Slide Ch.4 |
 
-Mỗi người tự thuyết trình phần của mình (~5 phút/người).
+Thuyết trình: **cả nhóm 10 phút** (Doanh mở 1 phút + kết 1.5 phút, V.V. Dương / N.T. Dương / Đạt mỗi người 2.5 phút), xem [bao_cao/on_tap/](bao_cao/on_tap/README.md).
 
 ## Quy ước làm việc
 - Mỗi người làm trên nhánh riêng (`git checkout -b <ten>/<viec>`), tạo Pull Request; nhóm trưởng review rồi merge vào `main`.

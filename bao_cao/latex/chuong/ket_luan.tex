@@ -22,7 +22,7 @@
 \section*{Hướng phát triển}
 
 \begin{itemize}
-\item \textbf{Thuật toán Barnes--Hut} (cây octree, $O(N\log N)$)~\cite{barnes1986} hoặc \textbf{Fast Multipole Method} ($O(N)$) để mô phỏng hàng triệu vật thể.
+\item \textbf{Thuật toán Barnes--Hut} (cây octree, $O(N\log N)$) hoặc \textbf{Fast Multipole Method} ($O(N)$) để mô phỏng hàng triệu vật thể.
 \item \textbf{Nhiều GPU, nhiều máy} bằng MPI: chia các vật thể cho từng tiến trình, trao đổi vị trí mỗi bước theo mô hình vòng (ring).
 \item \textbf{Tối ưu kernel CUDA:} thử các mức mở vòng lặp khác (hiện dùng \code{\#pragma unroll 8}), mỗi luồng tính nhiều vật thể (thread coarsening), khai thác định luật 3 Newton theo khối để vẫn giữ được vector hóa.
 \item \textbf{Tích phân bậc cao hơn} (leapfrog, Hermite bậc 4) và bước thời gian thích nghi để giảm sai số năng lượng.

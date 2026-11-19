@@ -1,6 +1,6 @@
 # Trần Tiến Đạt: Song song hóa bằng CUDA
 
-**Slide:** 19–24 (~5 phút)
+**Slide:** 9–10 (~2.5 phút)
 **Báo cáo:** Mục 2.2.4 (roofline), 2.5 (mô hình CUDA, kiến trúc GPU), 3.4 (cài đặt và thực nghiệm CUDA)
 **Code:** [nbody_cuda.cu](../../src/nbody_cuda.cu), [notebooks/nbody_colab.ipynb](../../notebooks/nbody_colab.ipynb)
 
@@ -8,11 +8,10 @@
 
 | Slide | Nói gì | Thời gian |
 |---|---|---|
-| 20 Mô hình CUDA | Lưới → khối → luồng; mỗi warp 32 luồng chạy cùng một lệnh. Khối được chạy trên các SM. Luồng trong cùng khối dùng chung shared memory và đồng bộ bằng `__syncthreads()`. Phân cấp bộ nhớ: thanh ghi, shared, L1/L2, global. T4 có 40 SM, 8.1 TFLOP/s, 320 GB/s. | 50 s |
-| 21 Roofline | Mỗi tương tác 20 FLOP, đọc 16 byte, nên AI = 1.25, thấp hơn nhiều so với điểm cân bằng 25.3 của T4. Đọc thẳng từ global memory thì bị **giới hạn bởi bộ nhớ**. Nhưng mỗi vị trí được dùng lại N lần: nếu B luồng nạp chung thì AI tăng B lần (≈ 320). | 50 s |
-| 22 Kernel tiled | Cả khối nạp một tile B vị trí vào shared memory, mỗi luồng nạp một phần tử. Sau đó mỗi luồng dùng lại cả B phần tử. Hai lần `__syncthreads()`: lần 1 chờ nạp xong rồi mới đọc; lần 2 chờ dùng xong rồi mới nạp tile mới. | 60 s |
-| 23 Kết quả T4 | Tiled đạt 4.7 TFLOP/s (≈ 58% đỉnh) ở N = 16384. Nhanh hơn naive 1.5–1.7× khi N ≤ 8192, chỉ còn ~1.2× khi N lớn vì bộ đệm L1/L2 đã giúp naive. Kích thước khối 64–512 chênh nhau dưới 4%; B = 256 tốt nhất. | 60 s |
-| 24 Truyền dữ liệu | Chi phí H2D + D2H giảm từ 5.7% xuống 0.29% vì truyền là O(N) còn tính là O(N²). Điều kiện: dữ liệu nằm trên GPU suốt mô phỏng. → *"Mời bạn Doanh trình bày so sánh tổng hợp và kết luận."* | 40 s |
+| 9 Kernel tiled | Mỗi luồng GPU tính một vật thể. Naive đọc thẳng global memory: 20 FLOP trên 16 byte = 1.25 FLOP/byte, thấp hơn nhiều so với 25.3 của T4, nên **nghẽn bộ nhớ**. Tiled (GPU Gems 3): cả khối nạp chung một tile vào shared memory, mỗi luồng dùng lại B lần, nên đọc global memory giảm B lần. Hai `__syncthreads()`: chờ nạp xong rồi mới đọc, chờ dùng xong rồi mới nạp tile mới. | 80 s |
+| 10 Kết quả T4 | Tiled đạt 4.7 TFLOP/s (≈ 58% đỉnh). Nhanh hơn naive 1.5–1.7× khi N nhỏ, còn ~1.2× khi N lớn vì L1/L2 giúp naive. B = 256 tốt nhất nhưng chênh dưới 4%. Chép dữ liệu chỉ 0.29% thời gian vì dữ liệu nằm trên GPU suốt mô phỏng. → *"Mời bạn Doanh."* | 70 s |
+
+Các nội dung không còn trên slide (mô hình CUDA, phân cấp bộ nhớ, thông số T4, bảng H2D/D2H) vẫn có trong báo cáo. Hãy ôn để trả lời nếu bị hỏi.
 
 ## Số liệu phải thuộc
 

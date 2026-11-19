@@ -6,7 +6,7 @@ Chương này trình bày việc cài đặt bốn phiên bản theo chiến lư
 \section{Môi trường và phương pháp đo}
 \label{sec:moi-truong}
 
-Toàn bộ mã nguồn viết bằng C (bản CPU) và CUDA C++ (bản GPU), dùng chung các hàm khởi tạo, tính năng lượng và tham số dòng lệnh trong \code{src/nbody\_common.h}~\cite{repo}. Bảng~\ref{tab:moi-truong} tóm tắt môi trường của phép đo tổng hợp.
+Toàn bộ mã nguồn viết bằng C (bản CPU) và CUDA C++ (bản GPU), dùng chung các hàm khởi tạo, tính năng lượng và tham số dòng lệnh trong \code{src/nbody\_common.h}. Mã nguồn, số liệu thô và đồ thị nằm tại \url{https://github.com/doanh9a246-afk/motcongmotbangmay}. Bảng~\ref{tab:moi-truong} tóm tắt môi trường của phép đo tổng hợp.
 
 \begin{table}[H]
 \centering\small
@@ -98,7 +98,7 @@ Quỹ đạo được tạo với $N=1024$, 2000 bước, $\Delta t=0.002$, $\va
 \subsection{Cài đặt}
 
 \subsubsection{Chia vòng lặp ngoài}
-Theo chiến lược ở Mục~\ref{sec:chien-luoc}, chỉ thị \code{\#pragma omp parallel for} được đặt trên vòng lặp ngoài $i$ của pha tính gia tốc (Hình~\ref{fig:tuan-tu}); mỗi luồng nhận một đoạn chỉ số $i$ và tính trọn tổng theo $j$ cho các vật thể đó:
+Theo chiến lược ở Mục~\ref{sec:chien-luoc}, chỉ thị \code{\#pragma omp parallel for}~\cite{openmp52} được đặt trên vòng lặp ngoài $i$ của pha tính gia tốc (Hình~\ref{fig:tuan-tu}); mỗi luồng nhận một đoạn chỉ số $i$ và tính trọn tổng theo $j$ cho các vật thể đó:
 \begin{lstlisting}[language=C]
 static void nb_acc_omp(const vec4f *pos, vec4f *acc, int n, float eps2)
 {
@@ -423,7 +423,7 @@ i = \text{blockIdx.x} \times \text{blockDim.x} + \text{threadIdx.x}.
 \end{equation}
 Do số luồng có thể lớn hơn $N$, mỗi luồng kiểm tra $i<N$ trước khi tính. Mỗi luồng chỉ ghi \code{acc[i]} của mình nên không cần phép toán nguyên tử như \code{atomicAdd}. Chương trình khảo sát $B \in \{64, 128, 256, 512\}$.
 
-Mảng vị trí được lưu dạng \code{float4}: ba thành phần $x,y,z$ là tọa độ, thành phần $w$ là khối lượng. Một bản ghi 16 byte giúp mỗi luồng đọc cả vị trí và khối lượng trong một lần truy cập. Dữ liệu được sao chép lên GPU một lần trước vòng lặp thời gian và chỉ chép về CPU ở cuối mô phỏng; mỗi bước gồm một kernel tính gia tốc và một kernel cập nhật trạng thái.
+Mảng vị trí được lưu dạng \code{float4} như trong GPU Gems 3~\cite{gpugems3}: ba thành phần $x,y,z$ là tọa độ, thành phần $w$ là khối lượng. Một bản ghi 16 byte giúp mỗi luồng đọc cả vị trí và khối lượng trong một lần truy cập. Dữ liệu được sao chép lên GPU một lần trước vòng lặp thời gian và chỉ chép về CPU ở cuối mô phỏng; mỗi bước gồm một kernel tính gia tốc và một kernel cập nhật trạng thái.
 
 \subsection{Kernel naive}
 
@@ -505,7 +505,7 @@ for (int tile = 0; tile * blockDim.x < n; tile++) {
 if (i < n) acc[i] = make_float4(a.x, a.y, a.z, 0.0f);
 \end{lstlisting}
 
-Kernel được gọi với kích thước shared memory động \code{B * sizeof(float4)} (tham số thứ ba trong \code{<<<grid, B, B*sizeof(float4)>>>}), nên cùng một mã chạy được với mọi $B$. Khác với kernel naive, luồng có $i \ge N$ \emph{không} được thoát sớm, vì mọi luồng của khối đều phải nạp tile và đi qua \code{\_\_syncthreads()}. Phần tử đệm ngoài phạm vi được gán khối lượng 0 nên đóng góp 0 vào gia tốc, không cần rẽ nhánh trong vòng trong. Hai lệnh đồng bộ có vai trò khác nhau và đều cần thiết:
+Kernel được gọi với kích thước shared memory động \code{B * sizeof(float4)} (tham số thứ ba trong \code{<<<grid, B, B*sizeof(float4)>>>}), nên cùng một mã chạy được với mọi $B$. Khác với kernel naive, luồng có $i \ge N$ \emph{không} được thoát sớm, vì mọi luồng của khối đều phải nạp tile và đi qua \code{\_\_syncthreads()}. Phần tử đệm ngoài phạm vi được gán khối lượng 0 nên đóng góp 0 vào gia tốc, không cần rẽ nhánh trong vòng trong. Hai lệnh đồng bộ có vai trò khác nhau và đều cần thiết~\cite{gpugems3}:
 \begin{itemize}
 \item \textbf{Lần (1) -- đọc sau ghi (RAW):} bảo đảm mọi luồng trong khối đã ghi xong phần tử của mình vào \code{shPos} trước khi bất kỳ luồng nào đọc \code{shPos[j]}. Thiếu lệnh này, một số warp có thể đọc dữ liệu chưa được nạp hoặc dữ liệu của tile cũ.
 \item \textbf{Lần (2) -- ghi sau đọc (WAR):} bảo đảm không còn luồng nào đang đọc tile hiện tại trước khi tile tiếp theo được nạp đè lên cùng vùng nhớ. Thiếu lệnh này, warp chạy nhanh có thể ghi đè dữ liệu mà warp khác vẫn đang dùng.
