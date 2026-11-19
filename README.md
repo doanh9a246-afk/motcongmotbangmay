@@ -1,7 +1,7 @@
 # Song song hóa mô phỏng N-body (lực hấp dẫn) bằng OpenMP và CUDA
 
 **Nhóm:** Nguyễn Quốc Doanh (nhóm trưởng) · Vũ Văn Dương · Nguyễn Tùng Dương · Trần Tiến Đạt
-**Phân công:** xem [PHAN_CONG.md](PHAN_CONG.md)
+**Phân công:** xem [PHAN_CONG.md](PHAN_CONG.md) · **Tài liệu ôn thuyết trình:** [bao_cao/on_tap/](bao_cao/on_tap/README.md)
 
 Tài liệu tham khảo:
 - L. Nyland, M. Harris, J. Prins — *Fast N-Body Simulation with CUDA*, GPU Gems 3, Chương 31.
@@ -100,14 +100,17 @@ Trực quan hóa:
 python scripts/visualize.py results/traj.csv --gif
 ```
 
-Báo cáo PDF (ghép trang bìa, mục lục, Ch.1–Ch.5, tài liệu tham khảo):
+Báo cáo và slide viết bằng LaTeX trong `bao_cao/latex/` (Mở đầu → Ch.2 cơ sở lý thuyết tính toán song song → Ch.3 cài đặt và thực nghiệm → Kết luận). Cần XeLaTeX (MiKTeX hoặc TeX Live) và các font Times New Roman, Arial, Consolas:
 
 ```bash
-pip install markdown pypdf
-python scripts/build_report.py     # -> bao_cao/bao_cao_nhom.pdf (cần Chrome/Edge và mạng để tải KaTeX)
+make docs        # -> bao_cao/bao_cao_nhom.pdf và bao_cao/slide_nhom.pdf
+# hoặc không có make:
+cd bao_cao/latex && xelatex bao_cao.tex && xelatex bao_cao.tex && xelatex bao_cao.tex
+xelatex slide.tex && xelatex slide.tex
 ```
 
-Thông tin trường / học phần / giảng viên trên trang bìa sửa ở biến `COVER` trong `scripts/build_report.py`.
+- Thông tin trường / khoa / học phần / giảng viên trên trang bìa: các lệnh `\Truong`, `\Khoa`, `\HocPhan`, `\GiangVien` ở đầu `bao_cao/latex/bao_cao.tex`; trên slide: dòng `\institute{...}` trong `slide.tex`.
+- Nội dung từng chương: `bao_cao/latex/chuong/*.tex`; tài liệu tham khảo ở cuối `bao_cao.tex`.
 
 ## 6. Kết quả thử nghiệm sơ bộ (CPU)
 
@@ -143,7 +146,8 @@ src/nbody_common.h        khởi tạo Plummer, năng lượng, tham số, đo t
 src/nbody_cpu_kernels.h   nhân tính toán tuần tự + OpenMP (cũng là tham chiếu cho CUDA)
 src/nbody_cpu.c           chương trình CPU
 src/nbody_cuda.cu         chương trình CUDA (naive + tiled)
-scripts/                  benchmark.sh, plot_results.py, visualize.py, build_report.py
-bao_cao/                  ch1..ch5 (Markdown), bao_cao_nhom.pdf, slide_nhom.pptx
+scripts/                  benchmark.sh, plot_results.py, visualize.py
+bao_cao/latex/            nguồn LaTeX: bao_cao.tex, preamble.tex, chuong/*.tex, slide.tex (Beamer)
+bao_cao/                  bao_cao_nhom.pdf, slide_nhom.pdf (bản đã biên dịch)
 notebooks/                nbody_colab.ipynb
 ```

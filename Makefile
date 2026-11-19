@@ -30,7 +30,22 @@ CPU_BIN  := bin/nbody_cpu$(EXE)
 CUDA_BIN := bin/nbody_cuda$(EXE)
 HDRS     := src/nbody_common.h src/nbody_cpu_kernels.h
 
-.PHONY: cpu cuda all clean
+.PHONY: cpu cuda all clean report slide docs
+.DEFAULT_GOAL := cpu
+
+# Bao cao va slide LaTeX (can XeLaTeX: MiKTeX hoac TeX Live, font Times New Roman/Consolas/Arial)
+LATEX_DIR := bao_cao/latex
+XELATEX   := xelatex -interaction=nonstopmode -halt-on-error
+
+report:
+	cd $(LATEX_DIR) && $(XELATEX) bao_cao.tex && $(XELATEX) bao_cao.tex && $(XELATEX) bao_cao.tex
+	cp $(LATEX_DIR)/bao_cao.pdf bao_cao/bao_cao_nhom.pdf
+
+slide:
+	cd $(LATEX_DIR) && $(XELATEX) slide.tex && $(XELATEX) slide.tex
+	cp $(LATEX_DIR)/slide.pdf bao_cao/slide_nhom.pdf
+
+docs: report slide
 
 cpu: $(CPU_BIN)
 cuda: $(CUDA_BIN)

@@ -5,3 +5,18 @@ results/traj*.csv
 results/*.gif
 __pycache__/
 .ipynb_checkpoints/
+# LaTeX (ban PDF cuoi nam o bao_cao/*.pdf)
+bao_cao/latex/*.aux
+bao_cao/latex/*.log
+bao_cao/latex/*.toc
+bao_cao/latex/*.lof
+bao_cao/latex/*.lot
+bao_cao/latex/*.out
+bao_cao/latex/*.nav
+bao_cao/latex/*.snm
+bao_cao/latex/*.vrb
+bao_cao/latex/*.fls
+bao_cao/latex/*.fdb_latexmk
+bao_cao/latex/*.xdv
+bao_cao/latex/*.synctex.gz
+bao_cao/latex/*.pdf

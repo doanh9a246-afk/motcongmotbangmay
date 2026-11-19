@@ -1,0 +1,116 @@
+% Bao cao nhom: Song song hoa mo phong N-body bang OpenMP va CUDA
+% Bien dich (XeLaTeX):  latexmk -xelatex bao_cao.tex   hoac   make report  (o thu muc goc repo)
+\documentclass[12pt,a4paper,oneside]{report}
+\usepackage[fontsize=13pt]{scrextend}
+
+% ================= THONG TIN TRANG BIA =================
+\newcommand{\Truong}{ĐẠI HỌC QUỐC GIA HÀ NỘI}
+\newcommand{\Khoa}{TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN}
+\newcommand{\HocPhan}{Tính toán song song (MAT3148)}
+\newcommand{\GiangVien}{TS. Nguyễn Hải Vinh, TS. Mạc Đăng Trường}
+\newcommand{\NoiThoiGian}{Hà Nội - 2026}
+% =======================================================
+
+\input{preamble}
+
+\begin{document}
+
+% ---------------- Trang bia ----------------
+\begin{titlepage}
+\begin{tikzpicture}[remember picture,overlay]
+  \draw[line width=1.2pt] ([xshift=2.2cm,yshift=-1.5cm]current page.north west) rectangle ([xshift=-1.5cm,yshift=1.5cm]current page.south east);
+  \draw[line width=0.4pt] ([xshift=2.35cm,yshift=-1.65cm]current page.north west) rectangle ([xshift=-1.65cm,yshift=1.65cm]current page.south east);
+\end{tikzpicture}
+\centering
+\setstretch{1.2}
+{\bfseries\large
+\begin{minipage}{0.8\linewidth}\Truong\\[2pt]\Khoa\end{minipage}\par}
+\vspace{2pt}\rule{0.35\linewidth}{0.6pt}\par
+\vspace{2.6cm}
+{\bfseries\fontsize{20}{24}\selectfont BÁO CÁO BÀI TẬP LỚN\par}
+\vspace{0.4cm}
+{\begin{minipage}{0.7\linewidth}Học phần: \HocPhan\end{minipage}\par}
+\vspace{1.6cm}
+{\itshape Đề tài\par}
+\vspace{0.2cm}
+{\bfseries\fontsize{19}{25}\selectfont SONG SONG HÓA MÔ PHỎNG N-BODY\\(LỰC HẤP DẪN) BẰNG OPENMP VÀ CUDA\par}
+\vspace{1.5cm}
+{\begin{minipage}{0.75\linewidth}Giảng viên hướng dẫn: \GiangVien\end{minipage}\par}
+\vspace{0.8cm}
+{\itshape Nhóm sinh viên thực hiện\par}
+\vspace{0.2cm}
+{\small\setstretch{1.1}
+\begin{tabular}{|c|l|p{7cm}|}
+\hline
+\textbf{STT} & \textbf{Họ và tên} & \textbf{Nhiệm vụ chính} \\ \hline
+1 & Nguyễn Quốc Doanh (nhóm trưởng) & Tích hợp, benchmark tổng hợp, so sánh, kết luận \\ \hline
+2 & Vũ Văn Dương & Mô hình, thuật toán tuần tự, kiểm chứng \\ \hline
+3 & Nguyễn Tùng Dương & Song song hóa OpenMP \\ \hline
+4 & Trần Tiến Đạt & Song song hóa CUDA \\ \hline
+\end{tabular}\par}
+\vfill
+{\bfseries \NoiThoiGian\par}
+\end{titlepage}
+
+% ---------------- Phan dau ----------------
+\pagenumbering{roman}
+\setcounter{page}{2}
+\tableofcontents
+\clearpage
+\listoffigures
+\addcontentsline{toc}{chapter}{Danh mục hình vẽ}
+\clearpage
+\listoftables
+\addcontentsline{toc}{chapter}{Danh mục bảng biểu}
+
+\chapter*{Danh mục từ viết tắt}
+\addcontentsline{toc}{chapter}{Danh mục từ viết tắt}
+\begin{center}
+\begin{tabular}{p{2.6cm}p{5.6cm}p{6.2cm}}
+\toprule
+\textbf{Viết tắt} & \textbf{Tiếng Anh} & \textbf{Ý nghĩa} \\
+\midrule
+AVX2 & Advanced Vector Extensions 2 & Tập lệnh vector 256 bit của CPU x86 \\
+CPU & Central Processing Unit & Bộ xử lý trung tâm \\
+CUDA & Compute Unified Device Architecture & Nền tảng lập trình GPU của NVIDIA \\
+D2H / H2D & Device-to-Host / Host-to-Device & Sao chép dữ liệu GPU $\to$ CPU / CPU $\to$ GPU \\
+FLOP & Floating-point Operation & Phép toán dấu phẩy động \\
+FMA & Fused Multiply-Add & Lệnh nhân--cộng gộp \\
+GFLOP/s & Giga-FLOP per second & $10^9$ phép toán dấu phẩy động mỗi giây \\
+GPU & Graphics Processing Unit & Bộ xử lý đồ họa \\
+MIMD & Multiple Instruction, Multiple Data & Nhiều dòng lệnh, nhiều dòng dữ liệu \\
+OpenMP & Open Multi-Processing & Chuẩn lập trình song song bộ nhớ chia sẻ \\
+SIMD & Single Instruction, Multiple Data & Một lệnh, nhiều dữ liệu \\
+SIMT & Single Instruction, Multiple Threads & Một lệnh, nhiều luồng (mô hình của GPU) \\
+SM & Streaming Multiprocessor & Bộ đa xử lý của GPU NVIDIA \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ---------------- Noi dung ----------------
+\clearpage
+\pagenumbering{arabic}
+\input{chuong/ch1_mo_dau}
+\input{chuong/ch2_ly_thuyet_song_song}
+\input{chuong/ch3_cai_dat_thuc_nghiem}
+\input{chuong/ket_luan}
+
+% ---------------- Tai lieu tham khao ----------------
+\begin{thebibliography}{99}
+\addcontentsline{toc}{chapter}{Tài liệu tham khảo}
+\bibitem{gpugems3} L. Nyland, M. Harris, J. Prins, ``Fast N-Body Simulation with CUDA,'' trong H. Nguyen (chủ biên), \emph{GPU Gems 3}, Chương 31, Addison-Wesley, 2007.
+\bibitem{aarseth1974} S. J. Aarseth, M. Hénon, R. Wielen, ``A comparison of numerical methods for the study of star cluster dynamics,'' \emph{Astronomy and Astrophysics}, tập 37, tr. 183--187, 1974.
+\bibitem{plummer1911} H. C. Plummer, ``On the problem of distribution in globular star clusters,'' \emph{Monthly Notices of the Royal Astronomical Society}, tập 71, tr. 460--470, 1911.
+\bibitem{hairer2006} E. Hairer, C. Lubich, G. Wanner, \emph{Geometric Numerical Integration: Structure-Preserving Algorithms for Ordinary Differential Equations}, tái bản lần 2, Springer, 2006.
+\bibitem{flynn1972} M. J. Flynn, ``Some computer organizations and their effectiveness,'' \emph{IEEE Transactions on Computers}, tập C-21, số 9, tr. 948--960, 1972.
+\bibitem{amdahl1967} G. M. Amdahl, ``Validity of the single processor approach to achieving large scale computing capabilities,'' \emph{AFIPS Spring Joint Computer Conference}, tr. 483--485, 1967.
+\bibitem{gustafson1988} J. L. Gustafson, ``Reevaluating Amdahl's law,'' \emph{Communications of the ACM}, tập 31, số 5, tr. 532--533, 1988.
+\bibitem{williams2009} S. Williams, A. Waterman, D. Patterson, ``Roofline: an insightful visual performance model for multicore architectures,'' \emph{Communications of the ACM}, tập 52, số 4, tr. 65--76, 2009.
+\bibitem{barnes1986} J. Barnes, P. Hut, ``A hierarchical $O(N\log N)$ force-calculation algorithm,'' \emph{Nature}, tập 324, tr. 446--449, 1986.
+\bibitem{openmp52} OpenMP Architecture Review Board, \emph{OpenMP Application Programming Interface}, phiên bản 5.2, 2021. \url{https://www.openmp.org/specifications/}
+\bibitem{cudaguide} NVIDIA Corporation, \emph{CUDA C++ Programming Guide}. \url{https://docs.nvidia.com/cuda/cuda-c-programming-guide/}
+\bibitem{t4} NVIDIA Corporation, \emph{NVIDIA T4 Tensor Core GPU Datasheet}. \url{https://www.nvidia.com/en-us/data-center/tesla-t4/}
+\bibitem{repo} Mã nguồn, số liệu thô và đồ thị của đề tài. \url{https://github.com/doanh9a246-afk/motcongmotbangmay}
+\end{thebibliography}
+
+\end{document}
