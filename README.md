@@ -109,7 +109,7 @@ cd bao_cao/latex && xelatex bao_cao.tex && xelatex bao_cao.tex && xelatex bao_ca
 xelatex slide.tex && xelatex slide.tex
 ```
 
-- Thông tin trường / khoa / học phần trên trang bìa: các lệnh `Truong`, `Khoa`, `HocPhan` ở đầu `bao_cao/latex/bao_cao.tex`; trên slide: dòng `institute{...}` trong `slide.tex`.
+- Thông tin trường / khoa / học phần trên trang bìa: các lệnh `\Truong`, `\Khoa`, `\HocPhan` ở đầu `bao_cao/latex/bao_cao.tex`; trên slide: dòng `\institute{...}` trong `slide.tex`.
 - Nội dung từng chương: `bao_cao/latex/chuong/*.tex`; tài liệu tham khảo ở cuối `bao_cao.tex`.
 
 ## 6. Kết quả thử nghiệm sơ bộ (CPU)
