@@ -1,0 +1,547 @@
+% Slide thuyet trinh (Beamer, XeLaTeX):  xelatex slide.tex (2 lan)  hoac  make slide
+% Ban 25 PHUT cho ca nhom: V.V. Duong 7' (mo dau + ly thuyet) -> N.T. Duong 6' (OpenMP) -> Dat 7.5' (CUDA + so sanh, ket luan) -> Doanh 4.5' (demo)
+% Ten nguoi noi hien o chan moi slide: dat bang \nguoinoi{...} truoc cac frame.
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{fontspec}
+\usepackage{amsmath}
+\setsansfont{Calibri}[BoldFont=Calibri Bold,ItalicFont=Calibri Italic]
+\setmonofont{Consolas}[Scale=0.88]
+\usepackage{graphicx,booktabs,tikz}
+\usetikzlibrary{arrows.meta,positioning,shadows}
+\graphicspath{{../../results/}}
+
+% ---------- Giao dien ----------
+\definecolor{navy}{RGB}{27,54,93}
+\definecolor{navy2}{RGB}{44,82,130}
+\definecolor{blockbg}{RGB}{246,248,251}
+\definecolor{thanhden}{RGB}{30,34,40}
+\definecolor{nhan}{RGB}{192,68,20}
+\definecolor{xam}{RGB}{100,116,139}
+\usetheme{default}
+\useinnertheme[shadow=true]{rounded}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=black!90}
+\setbeamercolor{structure}{fg=navy}
+\setbeamercolor{title}{fg=white,bg=navy}
+\setbeamercolor{frametitle}{fg=white,bg=navy}
+\setbeamercolor{alerted text}{fg=nhan}
+\setbeamercolor{block title}{fg=white,bg=navy}
+\setbeamercolor{block body}{fg=black!90,bg=blockbg}
+\setbeamercolor{block title alerted}{fg=white,bg=nhan}
+\setbeamercolor{block body alerted}{fg=black!90,bg=nhan!6}
+\setbeamercolor{palette primary}{fg=white,bg=navy}
+\setbeamercolor{palette secondary}{fg=white,bg=navy2}
+\setbeamercolor{palette tertiary}{fg=white,bg=navy!85!black}
+\setbeamercolor{palette quaternary}{fg=white,bg=thanhden}
+\setbeamerfont{frametitle}{size=\large,series=\mdseries}
+\setbeamerfont{block title}{size=\normalsize,series=\bfseries}
+\setbeamerfont{alerted text}{series=\bfseries}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\raisebox{0.15ex}{\color{navy}\scriptsize$\bullet$}}
+\setbeamertemplate{itemize subitem}{\raisebox{0.15ex}{\color{navy2}\tiny$\blacktriangleright$}}
+\setbeamersize{text margin left=0.45cm,text margin right=0.45cm}
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=0.14cm,dp=0pt]{palette quaternary}\end{beamercolorbox}%
+  \nointerlineskip%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=2.8ex,dp=1.25ex,leftskip=0.6cm]{frametitle}\insertframetitle\end{beamercolorbox}%
+}
+\newcommand{\nguoi}{}
+\newcommand{\nguoinoi}[1]{\renewcommand{\nguoi}{#1}}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.36\paperwidth,ht=2.3ex,dp=1ex,leftskip=0.5cm]{palette tertiary}%
+      \scriptsize\nguoi
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.46\paperwidth,ht=2.3ex,dp=1ex,center]{palette secondary}%
+      \scriptsize\insertsection
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.3ex,dp=1ex,right,rightskip=0.5cm]{palette primary}%
+      \scriptsize\insertframenumber\,/\,\inserttotalframenumber
+    \end{beamercolorbox}%
+  }%
+  \vskip0pt%
+}
+\newcommand{\so}[2]{\begin{minipage}[t]{3.4cm}\centering{\Huge\bfseries\color{nhan}#1}\\[2pt]\small #2\end{minipage}}
+\newcommand{\code}[1]{\texttt{\color{navy}#1}}
+
+\title{Song song hóa mô phỏng N-body bằng OpenMP và CUDA}
+\author{Nguyễn Quốc Doanh \and Vũ Văn Dương \and Nguyễn Tùng Dương \and Trần Tiến Đạt}
+\institute{Trường Đại học Khoa học Tự nhiên -- ĐHQG Hà Nội}
+\date{Tháng 11 Năm 2026}
+
+\begin{document}
+
+% ---------------- Trang bia ----------------
+\begin{frame}[plain]
+\centering
+\vfill
+{\footnotesize\color{xam} TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN -- ĐHQG HÀ NỘI}\\[4pt]
+{\large\bfseries\color{navy} TÍNH TOÁN SONG SONG (MAT3148 1) -- LỚP K69A5}\par
+\vspace{14pt}
+\makebox[\linewidth][c]{%
+\begin{beamercolorbox}[wd=0.84\textwidth,sep=13pt,center,rounded=true,shadow=true]{title}
+{\Large\bfseries SONG SONG HÓA MÔ PHỎNG N-BODY\\[4pt]BẰNG OPENMP VÀ CUDA}
+\end{beamercolorbox}%
+}\par
+\vspace{18pt}
+{\normalsize\bfseries Nhóm trình bày:}\\[6pt]
+{\small
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}l@{\hspace{14pt}}l@{\hspace{34pt}}l@{\hspace{14pt}}l@{}}
+\textbf{Nguyễn Quốc Doanh} {\scriptsize(nhóm trưởng)} & 24001656 & \textbf{Trần Tiến Đạt} & 24001663 \\
+\textbf{Nguyễn Tùng Dương} & 24001661 & \textbf{Vũ Văn Dương} & 24001662 \\
+\end{tabular}}\par
+\vspace{12pt}
+{\small\color{black!85}
+\textbf{Thuật toán dựa trên:} L. Nyland, M. Harris, J. Prins\\[2pt]
+{\footnotesize\color{xam} ``Fast N-Body Simulation with CUDA'', \emph{GPU Gems 3}, Ch.~31, 2007}}\par
+\vspace{12pt}
+{\small\color{xam} Tháng 11 Năm 2026}
+\vfill
+\end{frame}
+
+% =====================================================================
+\section{Mở đầu}
+\nguoinoi{Trình bày: Vũ Văn Dương}
+
+\begin{frame}{Nội dung trình bày}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{block}{I. Mở đầu \& Cơ sở lý thuyết}
+\footnotesize
+\begin{itemize}
+\setlength{\itemsep}{1pt}
+\item Bài toán $O(N^2)$, mục tiêu \& tính cấp thiết
+\item Song song hóa, Amdahl \& Gustafson
+\item Kiểm chứng đúng \& bảo toàn năng lượng
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{block}{III. Song song hóa GPU với CUDA}
+\footnotesize
+\begin{itemize}
+\setlength{\itemsep}{1pt}
+\item Kernel Naive vs.\ Tiled Shared Memory [1]
+\item Thực nghiệm hiệu năng trên Tesla T4
+\item Khảo sát Block Size \& chi phí H2D/D2H
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\vspace{2pt}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{block}{II. Song song hóa CPU với OpenMP}
+\footnotesize
+\begin{itemize}
+\setlength{\itemsep}{1pt}
+\item Fork--Join, đa luồng \& SIMD AVX2
+\item Speedup trên CPU lai (4P + 8E)
+\item Lập lịch \code{static}/\code{dynamic} \& Newton 3
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{block}{IV. So sánh, Kết luận \& Demo}
+\footnotesize
+\begin{itemize}
+\setlength{\itemsep}{1pt}
+\item Đối chiếu Tuần tự, OpenMP, CUDA theo $N$
+\item Kết luận, bài học \& hướng phát triển
+\item Demo: chạy tuần tự, OpenMP, \code{-verify}
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Đặt vấn đề và mục tiêu}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{block}{Bài toán đặt ra}
+\small
+\begin{itemize}
+\setlength{\itemsep}{5pt}
+\item $N$ vật thể hút nhau $\Rightarrow$ \alert{$N^2$ tương tác} mỗi bước
+\item Các tương tác trong một bước \alert{độc lập} $\Rightarrow$ bài toán mẫu để song song hóa
+\item \textbf{Mục tiêu:} rút ngắn thời gian bằng \alert{OpenMP} (CPU) và \alert{CUDA} (GPU), kết quả vẫn khớp bản tuần tự
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.47\textwidth}
+\begin{block}{Bốn phiên bản, cùng đầu vào}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{ll}
+\toprule
+Tuần tự & mốc so sánh, kiểm chứng \\
+OpenMP & chia vòng ngoài + SIMD \\
+CUDA naive & 1 luồng = 1 vật thể \\
+CUDA tiled & shared memory [1] \\
+\bottomrule
+\end{tabular}\\[8pt]
+Kiểm tra đúng $\to$ đo thời gian, speedup, hiệu suất
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Tính cấp thiết của đề tài}
+\begin{columns}[T]
+\begin{column}{0.47\textwidth}
+\begin{block}{Nhu cầu thực tế}
+\small
+\begin{itemize}
+\setlength{\itemsep}{4pt}
+\item Thiên văn: tiến hóa cụm sao, thiên hà, va chạm thiên hà
+\item Cùng dạng ``mọi cặp tương tác'': động lực học phân tử (lực tĩnh điện), plasma
+\item Mô phỏng có ý nghĩa cần \alert{$N$ lớn} ($10^5$--$10^6$ vật) và \alert{nhiều bước} ($\ge10^4$)
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{block}{Chạy tuần tự trên 1 lõi CPU}
+\small
+\centering
+\setlength{\tabcolsep}{7pt}
+\begin{tabular}{rrr}
+\toprule
+$N$ & 1 bước & $10^4$ bước \\
+\midrule
+$10^4$ & 0.06 s & 10 phút \\
+$10^5$ & 6 s & \alert{16 giờ} \\
+$10^6$ & 10 phút & \alert{68 ngày} \\
+\bottomrule
+\end{tabular}\\[3pt]
+{\scriptsize\color{xam} Ước tính: 20 FLOP/tương tác, 1 lõi $\approx$ 34 GFLOP/s (đo thực tế)}
+\end{block}
+\end{column}
+\end{columns}
+\vspace{6pt}
+\begin{alertblock}{Vì sao phải song song hóa}
+\small
+$N$ tăng 10 lần $\Rightarrow$ thời gian tăng \alert{100 lần}. Xung nhịp một lõi gần như không tăng thêm; sức mạnh tính toán mới đến từ \textbf{nhiều lõi CPU} và \textbf{GPU hàng nghìn nhân} $\Rightarrow$ muốn nhanh hơn phải viết chương trình song song.
+\end{alertblock}
+\end{frame}
+
+% =====================================================================
+\section{Bài toán và lý thuyết}
+\nguoinoi{Trình bày: Vũ Văn Dương}
+
+\begin{frame}{Bài toán N-body và thuật toán tuần tự}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\begin{block}{Công thức gia tốc \& cập nhật theo thời gian}
+\small
+\[ \mathbf{a}_i = \frac{\mathbf{F}_i}{m_i} = \sum_j m_j \frac{\mathbf{r}_j-\mathbf{r}_i}{\left(\lVert\mathbf{r}_j-\mathbf{r}_i\rVert^2+\varepsilon^2\right)^{3/2}} \quad (G=1)\]
+\begin{itemize}
+\setlength{\itemsep}{4pt}
+\item \alert{Softening} $\varepsilon$: gia tốc hữu hạn; $j=i$ tự bằng 0 $\Rightarrow$ không cần \code{if}
+\item Mỗi bước $\Delta t$ (Euler đối xứng): $\mathbf{v}\mathrel{+}=\mathbf{a}\Delta t$ rồi $\mathbf{r}\mathrel{+}=\mathbf{v}\Delta t$
+\item Đầu vào: cụm sao Plummer, seed 42
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{block}{Mỗi bước có 2 pha}
+\small
+\begin{tabular}{lr}
+\toprule
+1. Tính gia tốc & \alert{$O(N^2)$} \\
+2. Cập nhật $\mathbf{v}$, $\mathbf{r}$ & $O(N)$ \\
+\bottomrule
+\end{tabular}\\[8pt]
+Pha 1 chiếm gần như toàn bộ thời gian $\Rightarrow$ cần song song hóa pha 1
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Khả năng song song và độ đo hiệu năng}
+\begin{columns}[T]
+\begin{column}{0.51\textwidth}
+\begin{block}{Phân tích phụ thuộc dữ liệu}
+\small
+\begin{itemize}
+\setlength{\itemsep}{5pt}
+\item Mỗi $\mathbf{a}_i$ chỉ \emph{đọc} \code{pos[]}, chỉ \emph{ghi} \code{acc[i]} $\Rightarrow$ các $i$ \alert{độc lập}, không xung đột ghi
+\item $N$ việc bằng nhau $\Rightarrow$ dễ cân bằng tải
+\item Giữa 2 pha cần barrier; các bước thời gian phải chạy lần lượt
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{Độ đo \& định luật mở rộng}
+\[ S_p=\frac{T_1}{T_p},\qquad E_p=\frac{S_p}{p} \]
+\begin{itemize}\small
+\setlength{\itemsep}{4pt}
+\item \textbf{Amdahl}: bài toán cố định, $S\le 1/(1-P)$
+\item \textbf{Gustafson}: bài toán lớn dần; phần $O(N)$ co lại so với $O(N^2)$ $\Rightarrow$ \alert{$N$ càng lớn, speedup càng cao}
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Kiểm chứng tính đúng đắn}
+\begin{columns}[c]
+\begin{column}{0.30\textwidth}
+\begin{block}{Kết quả kiểm chứng}
+\scriptsize
+\begin{itemize}
+\setlength{\itemsep}{3pt}
+\item \code{-verify}: OpenMP khớp tuần tự \alert{từng bit}; CUDA sai khác $\approx10^{-8}$ (làm tròn \code{float})
+\item $N=2048$, 2000 bước: $\Delta t>0.002$ $\Rightarrow$ sai số năng lượng tăng nhanh
+\item Chọn $\Delta t=0.002$, $\varepsilon=0.01$: $|\Delta E/E_0|\approx2.7\cdot10^{-6}$
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.69\textwidth}
+\centering
+\includegraphics[width=\linewidth,height=0.82\textheight,keepaspectratio]{vvduong_energy_dt}
+\end{column}
+\end{columns}
+\end{frame}
+
+% =====================================================================
+\section{OpenMP}
+\nguoinoi{Trình bày: Nguyễn Tùng Dương}
+
+\begin{frame}[fragile]{OpenMP: cách song song hóa}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\begin{block}{Mã nguồn song song 2 mức}
+\footnotesize
+\begin{verbatim}
+#pragma omp parallel for schedule(static)
+for (i = 0; i < n; i++) {        // chia i
+  #pragma omp simd reduction(+:ax,ay,az)
+  for (j = 0; j < n; j++) {      // AVX2
+    ... ax += dx*s; ...
+  }
+  acc[i] = (ax, ay, az);         // ghi riêng
+}
+\end{verbatim}
+\end{block}
+\end{column}
+\begin{column}{0.44\textwidth}
+\begin{block}{Cơ chế thực thi}
+\small
+\begin{itemize}
+\setlength{\itemsep}{5pt}
+\item \textbf{Fork--join}: luồng chủ tách nhóm luồng, barrier ngầm cuối vùng [2]
+\item Song song 2 mức: \alert{đa luồng} (vòng $i$) + \alert{SIMD} 8 \code{float}/lệnh (vòng $j$)
+\item Không cần \code{critical}/\code{atomic}
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{OpenMP: speedup theo số luồng (i5-12500H, 4P + 8E)}
+\centering
+\includegraphics[width=0.92\textwidth,height=4.75cm,keepaspectratio]{ntduong_threads_speedup}\par
+\vspace{1pt}
+\begin{columns}[c]
+\begin{column}{0.26\textwidth}
+\centering
+{\LARGE\bfseries\color{nhan}4.6×}\\[1pt]
+{\scriptsize tối đa, 16 luồng, $N=16384$ (148 GFLOP/s)}
+\end{column}
+\begin{column}{0.72\textwidth}
+\begin{block}{Phân tích theo số luồng}
+\begin{itemize}\scriptsize
+\setlength{\itemsep}{1pt}
+\item 1--2 luồng: gần tuyến tính (hiệu suất 91--95\%)
+\item 4--8 luồng: tăng chậm, vì 8 luồng đầu chỉ là 4 lõi P $\times$ 2 siêu luồng
+\item 16 luồng: thêm 8 lõi E chậm hơn, hiệu suất còn $\approx$28\%
+\item Giới hạn do phần cứng, không phải phần tuần tự
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{OpenMP: SIMD, lập lịch và định luật 3 Newton}
+\centering
+\includegraphics[width=0.80\textwidth,height=5.15cm,keepaspectratio]{ntduong_schedule_simd}\par
+\vspace{1pt}
+\begin{block}{So sánh biến thể tối ưu}
+\begin{itemize}\scriptsize
+\setlength{\itemsep}{1pt}
+\item \textbf{SIMD} nhanh hơn \alert{1.7--2.9×} (bản tắt dùng \code{no-tree-vectorize})
+\item \textbf{\code{dynamic}} nhanh hơn \code{static} 6--24\% (tăng theo $N$): lõi P làm xong thì lấy thêm việc
+\item \textbf{Newton 3} ($N^2/2$ cặp) lại \alert{chậm hơn} mọi cấu hình, 1.15--2.3×: đọc--ghi mảng đệm 4 MB, tải tam giác không đều
+\end{itemize}
+\end{block}
+\end{frame}
+
+% =====================================================================
+\section{CUDA}
+\nguoinoi{Trình bày: Trần Tiến Đạt}
+
+\begin{frame}{CUDA: kernel tiled dùng shared memory [1]}
+\centering
+\begin{tikzpicture}[>=Stealth, font=\small, scale=1.12, transform shape, box/.style={draw=navy, rounded corners=3pt, minimum height=0.58cm, align=center}]
+  \foreach \k/\t in {0/Tile 0, 1/Tile 1, 2/Tile 2, 3/$\cdots$, 4/Tile $k$} {
+    \node[box, minimum width=1.8cm, fill=blockbg] (g\k) at (\k*1.95,2.3) {\t};
+  }
+  \node[box, minimum width=1.8cm, fill=nhan!22, draw=nhan, thick, font=\small\bfseries] at (g2) {Tile 2};
+  \node[font=\scriptsize\itshape, anchor=east, color=xam] at (-1.1,2.3) {global memory};
+  \node[box, minimum width=3.6cm, fill=nhan!22, draw=nhan, thick] (sh) at (3.9,1.15) {\code{shPos[0..B-1]}};
+  \node[font=\scriptsize\itshape, anchor=east, color=nhan] at (-1.1,1.15) {shared memory};
+  \draw[->, thick, nhan] (g2.south) -- (sh.north);
+  \foreach \k/\t in {0/Luồng 0, 1/Luồng 1, 2/$\cdots$, 3/Luồng $B-1$} {
+    \node[box, minimum width=1.8cm, fill=navy!10] (t\k) at (\k*2.6,0) {\t};
+    \draw[->, navy2] (sh.south) -- (t\k.north);
+  }
+  \node[font=\scriptsize\itshape, anchor=east, color=navy] at (-1.1,0) {thanh ghi};
+\end{tikzpicture}
+\vspace{1pt}
+\begin{block}{Cơ chế tối ưu Shared Memory}
+\begin{itemize}\footnotesize
+\setlength{\itemsep}{1.5pt}
+\item 1 luồng = 1 vật thể. \textbf{Naive} đọc thẳng global memory: 20 FLOP / 16 byte $= 1.25$ FLOP/byte $\ll 25.3$ của T4 $\Rightarrow$ \alert{nghẽn bộ nhớ}
+\item \textbf{Tiled}: cả khối nạp chung 1 tile rồi mỗi luồng dùng lại $B$ lần $\Rightarrow$ đọc global memory giảm $B$ lần
+\item \code{\_\_syncthreads()} 2 lần: chờ nạp xong rồi mới đọc; chờ dùng xong rồi mới nạp tile mới
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{CUDA trên Tesla T4: kết quả}
+\centering
+\includegraphics[width=0.76\textwidth,height=5.15cm,keepaspectratio]{gpu_speedup}\par
+\vspace{1pt}
+\begin{columns}[c]
+\begin{column}{0.24\textwidth}
+\centering
+{\LARGE\bfseries\color{nhan}4.7 TFLOP/s}\\[1pt]
+{\scriptsize tiled, $N=16384$ ($\approx$58\% đỉnh T4)}
+\end{column}
+\begin{column}{0.74\textwidth}
+\begin{block}{Điểm nổi bật trên T4}
+\begin{itemize}\scriptsize
+\setlength{\itemsep}{1pt}
+\item Tiled nhanh hơn naive 1.5--1.7× ($N\le8192$), còn $\approx$1.2× khi $N$ lớn (L1/L2 đỡ cho naive)
+\item Kích thước khối 64--512 chênh $<4\%$, $B=256$ tốt nhất
+\item Chép CPU$\leftrightarrow$GPU chỉ \alert{0.29\%} thời gian ở $N=131072$ (dữ liệu nằm trên GPU suốt mô phỏng)
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+% =====================================================================
+\section{Kết luận}
+\nguoinoi{Trình bày: Trần Tiến Đạt}
+
+\begin{frame}{So sánh tổng hợp: thời gian mỗi bước theo $N$}
+\begin{columns}[c]
+\begin{column}{0.68\textwidth}
+\centering
+\includegraphics[width=\linewidth,height=0.82\textheight,keepaspectratio]{time_vs_n}
+\end{column}
+\begin{column}{0.31\textwidth}
+\centering
+{\LARGE\bfseries\color{nhan}4.6×}\\[1pt]
+{\scriptsize OpenMP vs. tuần tự ($N=131072$)}\\[6pt]
+{\LARGE\bfseries\color{nhan}121×}\\[1pt]
+{\scriptsize CUDA tiled vs. tuần tự (26× vs. OpenMP)}\par
+\vspace{6pt}
+\begin{block}{Nhận xét tổng hợp}
+\begin{itemize}\scriptsize
+\setlength{\itemsep}{2pt}
+\item Độ dốc $\approx2$ trên log--log: xác nhận $O(N^2)$
+\item CPU đo trên laptop, GPU trên Colab T4: chỉ so bậc độ lớn
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Kết luận và hướng phát triển}
+\begin{block}{Kết luận chính}
+\small
+\begin{itemize}
+\setlength{\itemsep}{4pt}
+\item Cả 4 phiên bản cho kết quả khớp nhau, năng lượng bảo toàn tốt
+\item OpenMP tới 5.0× trên CPU lai; CUDA tiled tới 144×, 4.7 TFLOP/s
+\item Kết quả khớp lý thuyết: speedup tăng theo $N$ (Gustafson); giới hạn thực tế đến từ phần cứng
+\item \alert{Bài học: cách truy cập bộ nhớ quan trọng không kém số phép tính}\\
+{\footnotesize Newton 3 tính ít hơn mà chậm hơn; tiled tính bằng naive mà nhanh hơn}
+\end{itemize}
+\end{block}
+\vspace{4pt}
+\begin{alertblock}{Hướng phát triển tiếp theo}
+\small
+Barnes--Hut $O(N\log N)$; nhiều GPU + MPI; tối ưu kernel (thread coarsening, CUDA streams)
+\end{alertblock}
+\end{frame}
+
+% =====================================================================
+\section{Demo}
+\nguoinoi{Trình bày: Nguyễn Quốc Doanh}
+
+\begin{frame}[fragile]{Demo: chạy chương trình trên laptop}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\begin{block}{Các lệnh chạy trực tiếp (PowerShell)}
+\footnotesize
+\begin{verbatim}
+make                      # bien dich -> bin/
+# 1. Tuan tu (moc so sanh)
+.\bin\nbody_cpu -n 8192 -s 5 -m serial
+# 2. OpenMP 16 luong
+$env:OMP_NUM_THREADS=16
+.\bin\nbody_cpu -n 8192 -s 5 -m omp
+# 3. Kiem tra ket qua + nang luong
+.\bin\nbody_cpu -n 2048 -s 5 -m omp -verify
+\end{verbatim}
+\end{block}
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{block}{Kết quả chạy thử ($N=8192$)}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrr}
+\toprule
+ & ms/bước & GFLOP/s \\
+\midrule
+Tuần tự & 38.2 & 35.1 \\
+OpenMP 16 luồng & 8.8 & 153 \\
+\bottomrule
+\end{tabular}\\[5pt]
+$\Rightarrow$ nhanh hơn \alert{$\approx$4.4×}\\[4pt]
+\code{-verify}: sai số \alert{0} $\to$ \textbf{PASS}\\
+$|\Delta E/E_0|\approx 9\cdot10^{-7}$ ($N=2048$, 5 bước)
+\end{block}
+\end{column}
+\end{columns}
+\vspace{4pt}
+\begin{block}{Xem thêm nếu còn thời gian}
+\small
+Quỹ đạo cụm sao: \code{results/vvduong\_energy\_orbit.gif} \quad$\cdot$\quad Số đo CUDA trên T4: \code{results/gpu\_t4.csv}
+\end{block}
+\end{frame}
+
+\nguoinoi{}
+\begin{frame}[plain]
+\centering\vfill
+\makebox[\linewidth][c]{%
+\begin{beamercolorbox}[wd=0.82\textwidth,sep=14pt,center,rounded=true,shadow=true]{title}
+{\Large\bfseries Cảm ơn thầy cô và các bạn đã lắng nghe}
+\end{beamercolorbox}%
+}\par
+\vspace{18pt}
+{\small Mã nguồn và số liệu: \code{github.com/doanh9a246-afk/motcongmotbangmay}}\par
+\vspace{18pt}
+{\scriptsize\color{gray}
+[1] L. Nyland, M. Harris, J. Prins, ``Fast N-Body Simulation with CUDA,'' \emph{GPU Gems 3}, Ch.~31, 2007.\\ \relax
+[2] OpenMP Architecture Review Board, \emph{OpenMP API Specification} 5.2, 2021.}
+\vfill
+\end{frame}
+
+\end{document}

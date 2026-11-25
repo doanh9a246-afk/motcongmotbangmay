@@ -1,0 +1,11 @@
+study,parameter,value,n,steps,dt,eps,threads,seed,energy_error,wall_s,cpu,compiler,cpu_cores,logical_processors
+dt,dt,0.0005,2048,2000,0.0005,0.01,16,42,1.7e-05,2.008,12th Gen Intel(R) Core(TM) i5-12500H,"gcc (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders) 12.1.0",12,16
+dt,dt,0.001,2048,2000,0.001,0.01,16,42,1.751e-06,2.051,12th Gen Intel(R) Core(TM) i5-12500H,"gcc (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders) 12.1.0",12,16
+dt,dt,0.002,2048,2000,0.002,0.01,16,42,2.663e-06,2.031,12th Gen Intel(R) Core(TM) i5-12500H,"gcc (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders) 12.1.0",12,16
+dt,dt,0.005,2048,2000,0.005,0.01,16,42,0.0001634,2.047,12th Gen Intel(R) Core(TM) i5-12500H,"gcc (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders) 12.1.0",12,16
+dt,dt,0.01,2048,2000,0.01,0.01,16,42,0.0007495,2.069,12th Gen Intel(R) Core(TM) i5-12500H,"gcc (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders) 12.1.0",12,16
+eps,eps,0.001,2048,2000,0.002,0.001,16,42,0.005688,2.062,12th Gen Intel(R) Core(TM) i5-12500H,"gcc (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders) 12.1.0",12,16
+eps,eps,0.00316227766,2048,2000,0.002,0.00316227766,16,42,0.000131,2.168,12th Gen Intel(R) Core(TM) i5-12500H,"gcc (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders) 12.1.0",12,16
+eps,eps,0.01,2048,2000,0.002,0.01,16,42,2.663e-06,2.291,12th Gen Intel(R) Core(TM) i5-12500H,"gcc (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders) 12.1.0",12,16
+eps,eps,0.0316227766,2048,2000,0.002,0.0316227766,16,42,1.817e-05,2.131,12th Gen Intel(R) Core(TM) i5-12500H,"gcc (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders) 12.1.0",12,16
+eps,eps,0.1,2048,2000,0.002,0.1,16,42,6.766e-06,2.165,12th Gen Intel(R) Core(TM) i5-12500H,"gcc (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders) 12.1.0",12,16

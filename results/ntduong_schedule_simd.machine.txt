@@ -1,0 +1,8 @@
+Nguoi thuc hien : Nguyen Quoc Doanh
+Ngay do        : 2026-11-25 21:43
+CPU            : 12th Gen Intel(R) Core(TM) i5-12500H
+So loi         : 12 (4P + 8E)
+So luong       : 16
+Compiler       : gcc.exe (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders) 12.1.0
+Co bien dich   : -O3 -march=native -ffast-math -fopenmp (NB_NO_VECTORIZE / no-tree-vectorize cho -simd 0)
+Tham so        : NS="2048 4096 8192 16384" SCHED="static dynamic guided" SIMD="1 0" THREADS=16 STEPS=5 REPS=3

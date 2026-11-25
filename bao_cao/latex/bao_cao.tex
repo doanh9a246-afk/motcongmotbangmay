@@ -1,0 +1,104 @@
+% Bao cao nhom: Song song hoa mo phong N-body bang OpenMP va CUDA
+% Bien dich (XeLaTeX):  latexmk -xelatex bao_cao.tex   hoac   make report  (o thu muc goc repo)
+\documentclass[12pt,a4paper,oneside]{report}
+\usepackage[fontsize=13pt]{scrextend}
+
+% ================= THONG TIN TRANG BIA =================
+\newcommand{\Truong}{ĐẠI HỌC QUỐC GIA HÀ NỘI\\TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN}
+\newcommand{\Khoa}{KHOA TOÁN -- CƠ -- TIN HỌC}
+\newcommand{\HocPhan}{Tính toán song song (MAT3148 1) -- Lớp K69A5}
+\newcommand{\NoiThoiGian}{Hà Nội, tháng 11 năm 2026}
+% =======================================================
+
+\input{preamble}
+
+\begin{document}
+
+% ---------------- Trang bia ----------------
+\begin{titlepage}
+\begin{tikzpicture}[remember picture,overlay]
+  \draw[line width=1.2pt] ([xshift=2.2cm,yshift=-1.5cm]current page.north west) rectangle ([xshift=-1.5cm,yshift=1.5cm]current page.south east);
+\end{tikzpicture}\par
+\setlength{\parindent}{0pt}
+\centering
+\setstretch{1.25}
+{\large\noindent ĐẠI HỌC QUỐC GIA HÀ NỘI\\
+\bfseries TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN\par}
+\vspace{1.2cm}
+\includegraphics[height=2.8cm]{logo_hus}\par
+\vspace{1.2cm}
+{\bfseries\fontsize{17}{21}\selectfont BÁO CÁO BÀI TẬP LỚN\par}
+\vspace{0.3cm}
+{\bfseries\fontsize{19}{25}\selectfont SONG SONG HÓA MÔ PHỎNG N-BODY\\(LỰC HẤP DẪN) BẰNG OPENMP VÀ CUDA\par}
+\vspace{1.2cm}
+{\bfseries\large TÍNH TOÁN SONG SONG\par}
+{\normalsize MAT3148 1 -- Lớp K69A5\par}
+\vspace{0.25cm}
+{\normalsize
+Thuật toán dựa trên: L. Nyland, M. Harris, J. Prins\\
+{\small ``Fast N-Body Simulation with CUDA'', \emph{GPU Gems 3}, Chương 31, 2007}\par}
+\vspace{1.0cm}
+{\bfseries Nhóm trình bày:\par}
+\vspace{0.35cm}
+{\normalsize\setstretch{1.25}
+\begin{tabular}{@{}l@{\hspace{2.2cm}}l@{}}
+Nguyễn Quốc Doanh & 24001656 \\
+Vũ Văn Dương      & 24001662 \\
+Nguyễn Tùng Dương & 24001661 \\
+Trần Tiến Đạt     & 24001663 \\
+\end{tabular}\par}
+\vfill
+{\bfseries \NoiThoiGian\par}
+\end{titlepage}
+
+% ---------------- Phan dau ----------------
+\pagenumbering{roman}
+\setcounter{page}{2}
+\tableofcontents
+\clearpage
+\listoffigures
+\addcontentsline{toc}{chapter}{Danh mục hình vẽ}
+\clearpage
+\listoftables
+\addcontentsline{toc}{chapter}{Danh mục bảng biểu}
+
+\chapter*{Danh mục từ viết tắt}
+\addcontentsline{toc}{chapter}{Danh mục từ viết tắt}
+\begin{center}
+\begin{tabular}{p{2.6cm}p{5.6cm}p{6.2cm}}
+\toprule
+\textbf{Viết tắt} & \textbf{Tiếng Anh} & \textbf{Ý nghĩa} \\
+\midrule
+AVX2 & Advanced Vector Extensions 2 & Tập lệnh vector 256 bit của CPU x86 \\
+CPU & Central Processing Unit & Bộ xử lý trung tâm \\
+CUDA & Compute Unified Device Architecture & Nền tảng lập trình GPU của NVIDIA \\
+D2H / H2D & Device-to-Host / Host-to-Device & Sao chép dữ liệu GPU $\to$ CPU / CPU $\to$ GPU \\
+FLOP & Floating-point Operation & Phép toán dấu phẩy động \\
+FMA & Fused Multiply-Add & Lệnh nhân--cộng gộp \\
+GFLOP/s & Giga-FLOP per second & $10^9$ phép toán dấu phẩy động mỗi giây \\
+GPU & Graphics Processing Unit & Bộ xử lý đồ họa \\
+MIMD & Multiple Instruction, Multiple Data & Nhiều dòng lệnh, nhiều dòng dữ liệu \\
+OpenMP & Open Multi-Processing & Chuẩn lập trình song song bộ nhớ chia sẻ \\
+SIMD & Single Instruction, Multiple Data & Một lệnh, nhiều dữ liệu \\
+SIMT & Single Instruction, Multiple Threads & Một lệnh, nhiều luồng (mô hình của GPU) \\
+SM & Streaming Multiprocessor & Bộ đa xử lý của GPU NVIDIA \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ---------------- Noi dung ----------------
+\clearpage
+\pagenumbering{arabic}
+\input{chuong/ch1_mo_dau}
+\input{chuong/ch2_ly_thuyet_song_song}
+\input{chuong/ch3_cai_dat_thuc_nghiem}
+\input{chuong/ket_luan}
+
+% ---------------- Tai lieu tham khao ----------------
+\begin{thebibliography}{99}
+\addcontentsline{toc}{chapter}{Tài liệu tham khảo}
+\bibitem{gpugems3} L. Nyland, M. Harris, J. Prins, ``Fast N-Body Simulation with CUDA,'' trong H. Nguyen (chủ biên), \emph{GPU Gems 3}, Chương 31, Addison-Wesley, 2007. \url{https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-31-fast-n-body-simulation-cuda}
+\bibitem{openmp52} OpenMP Architecture Review Board, \emph{OpenMP Application Programming Interface}, phiên bản 5.2, 2021. \url{https://www.openmp.org/specifications/}
+\end{thebibliography}
+
+\end{document}

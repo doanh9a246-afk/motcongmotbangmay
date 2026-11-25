@@ -1,0 +1,10 @@
+Ngay do   : 2026-11-15 14:00
+He dieu hanh: Linux 6.6.159+
+CPU       : Intel(R) Xeon(R) CPU @ 2.00GHz
+So loi    : 1
+So luong  : 2
+Compiler  : gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+GPU       : Tesla T4, 580.82.07
+nvcc      : Build cuda_13.0.r13.0/compiler.36424714_0
+Tham so   : NS="1024 2048 4096 8192 16384" THREADS="1 2 4 8 2" STEPS=5 REPS=3 BIG_NS="32768 65536 131072" BIG_STEPS=1
+            CUDA_NS="32768 65536 131072" BLOCKS="64 128 256 512"
